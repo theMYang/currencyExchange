@@ -1,10 +1,12 @@
 package com.wbo.currencyExchange.domain;
 
-public class UserLogin {
+import java.io.Serializable;
+
+public class UserLogin implements Serializable{
 	
 	private int userLoginId;
 	private String loginName;
-	private String password;
+	private transient String password;
 	private int userState;
 	private String mobilePhone;
 	
@@ -39,5 +41,10 @@ public class UserLogin {
 		this.mobilePhone = mobilePhone;
 	}
 	
+	@Override
+	public String toString() {
+		return "UserLogin [userLoginId=" + userLoginId + ", loginName=" + loginName + ", password=" + password
+				+ ", userState=" + userState + ", mobilePhone=" + mobilePhone + "]";
+	}
 	
 }

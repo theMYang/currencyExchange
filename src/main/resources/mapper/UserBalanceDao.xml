@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Configuration 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.wbo.currencyExchange.dao.UserDao.UserBalanceDao">
+	
+	<insert id="insertUserBalance">
+	     <selectKey  keyColumn="balance_id" resultType="java.lang.Integer" keyProperty="balanceId" order="AFTER"> 
+	       select last_insert_id()
+	     </selectKey>
+	     insert into user_balance (account_id, user_id, balance_source) values (#{accountId}, #{userId}, #{balanceSource})
+	</insert>
+
+</mapper>
