@@ -7,5 +7,10 @@ import com.wbo.currencyExchange.result.CodeMsg;
 
 public interface UserLoginService {
 
-	public CodeMsg getUserLoginById(HttpServletResponse response, UserLogin userLogin) ;
+	public static final String COOKIE_NAME_TOKEN = "token";
+	
+	public CodeMsg getUserLogin(HttpServletResponse response, UserLogin userLogin) ;
+	
+	public UserLogin getByToken(HttpServletResponse response, String token) ;
+	
 }

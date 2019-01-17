@@ -37,7 +37,7 @@ public class UserLoginController {
 	@RequestMapping("/doLogin")
 	@ResponseBody
 	public ResultCode<Boolean> doLogin(HttpServletResponse response, UserLogin userLogin){
-		CodeMsg loginCodeMsg = userLoginService.getUserLoginById(response, userLogin);
+		CodeMsg loginCodeMsg = userLoginService.getUserLogin(response, userLogin);
 		if(loginCodeMsg.getCode() == 0) {
 			return ResultCode.success(true);
 		}else {

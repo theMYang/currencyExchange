@@ -11,5 +11,5 @@ public interface UserLoginDao {
 //	@Select("select login_name, password, user_state, mobile_phone from user_login where user_login_id= #{id}")
 //	public UserLogin getById(@Param("id") int id);
 	
-	public UserLogin getUserLoginById(UserLogin userLogin);
+	public UserLogin getUserLogin(UserLogin userLogin);
 }

@@ -3,7 +3,7 @@
 
 <mapper namespace="com.wbo.currencyExchange.dao.UserDao.UserLoginDao">
 	
-	<select id="getUserLoginById" resultType="UserLogin">
+	<select id="getUserLogin" resultType="UserLogin">
 		select user_login_id, login_name, password, user_state, mobile_phone 
 		from user_login 
 		where password= #{password} and mobile_phone=#{mobilePhone}
