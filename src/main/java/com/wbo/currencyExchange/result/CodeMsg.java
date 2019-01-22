@@ -8,8 +8,14 @@ public class CodeMsg {
 	public static CodeMsg SUCCESS = new CodeMsg(0, "success");
 	public static CodeMsg SERVER_ERROR = new CodeMsg(10100, "服务端异常");
 	public static CodeMsg BIND_ERROR = new CodeMsg(10101, "参数校验异常：%s");
-	//登录模块 102XX
-	public static CodeMsg LOGIN_ERROR = new CodeMsg(10201, "登录名或密码错误");
+	//中间件 102XX
+	public static CodeMsg MQ_CONFIRM_ERROR = new CodeMsg(10201, "消息队列确认异常：%s");
+	public static CodeMsg MQ_RETURN_ERROR = new CodeMsg(10101, "消息队列投递异常：%s");
+	
+	
+	//登录模块 103XX
+	public static CodeMsg LOGIN_ERROR = new CodeMsg(10301, "登录名或密码错误");
+	
 	
 	
 	private CodeMsg(int code, String msg) {

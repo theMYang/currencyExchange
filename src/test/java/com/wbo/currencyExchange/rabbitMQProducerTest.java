@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.wbo.currencyExchange.domain.UserLogin;
-import com.wbo.currencyExchange.rabbitMQ.RabbitSender;
+import com.wbo.currencyExchange.rabbitMQ.producer.RabbitSender;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

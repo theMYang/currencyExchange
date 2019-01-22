@@ -1,4 +1,4 @@
-package com.wbo.currencyExchange.rabbitMQ;
+package com.wbo.currencyExchange.rabbitMQ.producer;
 
 import java.util.Map;
 
