@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Configuration 3.0//EN" "mybatis-3-mapper.dtd" >
 
-<mapper namespace="com.wbo.currencyExchange.dao.UserDao.UserRegisterDao">
+<mapper namespace="com.wbo.currencyExchange.dao.userDao.UserRegisterDao">
 	
 	<insert id="insertUserLogin">
-	     <selectKey  keyColumn="user_login_id" resultType="java.lang.Integer" keyProperty="userLoginId" order="AFTER"> 
+	     <selectKey  keyColumn="user_id" resultType="java.lang.Integer" keyProperty="userId" order="AFTER"> 
 	       select last_insert_id()
 	     </selectKey>
 	     insert into user_login (login_name, password, mobile_phone) values (#{loginName}, #{password}, #{mobilePhone})

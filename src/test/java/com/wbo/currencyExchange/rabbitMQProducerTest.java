@@ -42,7 +42,7 @@ public class rabbitMQProducerTest {
 		 user.setLoginName("测不准");
 		 user.setMobilePhone("1309696");
 		 user.setPassword("1416");
-		 user.setUserLoginId(123);
+		 user.setUserId(123);
 		 user.setUserState(1);
 		rabbitSender.sendUser(user);
 	}

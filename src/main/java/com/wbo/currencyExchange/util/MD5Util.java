@@ -22,6 +22,11 @@ public class MD5Util {
 		return md5(str);
 	}
 	
+	public static String EncoderByMd5ForUserLogin(String password) {
+		String passwdByMd5 = EncoderByMd5(password);
+		return passwdByMd5;
+	}
+	
 	public static void EncoderByMd5ForUserLogin(UserLogin userLogin) {
 		String passwdByMd5 = EncoderByMd5(userLogin.getPassword());
 		userLogin.setPassword(passwdByMd5);

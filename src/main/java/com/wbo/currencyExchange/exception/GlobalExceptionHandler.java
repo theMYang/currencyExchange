@@ -28,7 +28,8 @@ public class GlobalExceptionHandler {
 			ObjectError error = errors.get(0);
 			String msg = error.getDefaultMessage();
 			return ResultCode.error(CodeMsg.BIND_ERROR.fillArgs(msg));
-		}else {
+		}
+		else {
 			return ResultCode.error(CodeMsg.SERVER_ERROR);
 		}
 	}

@@ -26,10 +26,10 @@ public class DigitalCurrencyRedisTest {
         user.setLoginName("测不准的杂耍");
         user.setMobilePhone("13096930786");
         user.setPassword("12shit34");
-        user.setUserLoginId(1416463316);
+        user.setUserId(1416463316);
         user.setUserState(1);
-        redisTemplate.opsForValue().set(user.getUserLoginId(),user);
-        UserLogin result = (UserLogin) redisTemplate.opsForValue().get(user.getUserLoginId());
+        redisTemplate.opsForValue().set(user.getUserId(),user);
+        UserLogin result = (UserLogin) redisTemplate.opsForValue().get(user.getUserId());
 		logger.info("retJSON "+result.toString());
 	}
 }

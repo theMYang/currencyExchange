@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserInfo {
 
+	private int userInfId;
 	private int userId;
-	private int userLoginId;
 	private String loginName;
 	private String userName;
 	private String profileUrl;
@@ -23,17 +23,17 @@ public class UserInfo {
 	private Timestamp registerTime;
 	
 	
+	public int getUserInfId() {
+		return userInfId;
+	}
+	public void setUserInfId(int userInfId) {
+		this.userInfId = userInfId;
+	}
 	public int getUserId() {
 		return userId;
 	}
 	public void setUserId(int userId) {
 		this.userId = userId;
-	}
-	public int getUserLoginId() {
-		return userLoginId;
-	}
-	public void setUserLoginId(int userLoginId) {
-		this.userLoginId = userLoginId;
 	}
 	public String getLoginName() {
 		return loginName;

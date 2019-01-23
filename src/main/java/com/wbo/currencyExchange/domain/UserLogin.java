@@ -4,17 +4,26 @@ import java.io.Serializable;
 
 public class UserLogin implements Serializable{
 	
-	private int userLoginId;
+	private int userId;
 	private String loginName;
 	private transient String password;
 	private int userState;
 	private String mobilePhone;
 	
-	public int getUserLoginId() {
-		return userLoginId;
+	public UserLogin() {
+		
 	}
-	public void setUserLoginId(int userLoginId) {
-		this.userLoginId = userLoginId;
+	
+	public UserLogin(String loginName, String password, String mobilePhone) {
+		this.loginName = loginName;
+		this.password = password;
+		this.mobilePhone = mobilePhone;
+	}
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 	public String getLoginName() {
 		return loginName;
@@ -43,8 +52,7 @@ public class UserLogin implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "UserLogin [userLoginId=" + userLoginId + ", loginName=" + loginName + ", password=" + password
-				+ ", userState=" + userState + ", mobilePhone=" + mobilePhone + "]";
+		return "UserLogin [userId=" + userId + ", loginName=" + loginName + ", userState=" + userState
+				+ ", mobilePhone=" + mobilePhone + "]";
 	}
-	
 }

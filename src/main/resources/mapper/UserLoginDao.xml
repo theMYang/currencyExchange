@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Configuration 3.0//EN" "mybatis-3-mapper.dtd" >
 
-<mapper namespace="com.wbo.currencyExchange.dao.UserDao.UserLoginDao">
+<mapper namespace="com.wbo.currencyExchange.dao.userDao.UserLoginDao">
 	
 	<select id="getUserLogin" resultType="UserLogin">
-		select user_login_id, login_name, password, user_state, mobile_phone 
+		select user_id, login_name, password, user_state, mobile_phone 
 		from user_login 
 		where password= #{password} and mobile_phone=#{mobilePhone}
 	</select>

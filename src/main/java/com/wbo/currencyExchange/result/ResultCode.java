@@ -19,6 +19,12 @@ public class ResultCode<T> {
 		return new  ResultCode<T>(cm);
 	}
 	
+	private ResultCode(CodeMsg cm, T data) {
+		this.code = cm.getCode();
+		this.msg = cm.getMsg();
+		this.data = data;
+	}
+	
 	private ResultCode(T data) {
 		this.code = 0;
 		this.msg = "success";

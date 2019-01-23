@@ -11,10 +11,9 @@ public class UserBalance {
 	private int balanceId;
 	private int accountId;
 	private int userId;
-	private int balanceSource;
 	private int contractId;
 	private Timestamp changeTime;
-	private BigDecimal balanceChange;
+	private BigDecimal freezeAmount;
 	private BigDecimal balanceAmount;
 	private int balanceType;
 	
@@ -37,12 +36,6 @@ public class UserBalance {
 	public void setUserId(int userId) {
 		this.userId = userId;
 	}
-	public int getBalanceSource() {
-		return balanceSource;
-	}
-	public void setBalanceSource(int balanceSource) {
-		this.balanceSource = balanceSource;
-	}
 	public int getContractId() {
 		return contractId;
 	}
@@ -55,11 +48,11 @@ public class UserBalance {
 	public void setChangeTime(Timestamp changeTime) {
 		this.changeTime = changeTime;
 	}
-	public BigDecimal getBalanceChange() {
-		return balanceChange;
+	public BigDecimal getFreezeAmount() {
+		return freezeAmount;
 	}
-	public void setBalanceChange(BigDecimal balanceChange) {
-		this.balanceChange = balanceChange;
+	public void setFreezeAmount(BigDecimal freezeAmount) {
+		this.freezeAmount = freezeAmount;
 	}
 	public BigDecimal getBalanceAmount() {
 		return balanceAmount;
