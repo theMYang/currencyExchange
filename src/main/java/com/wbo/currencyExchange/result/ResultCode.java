@@ -13,10 +13,31 @@ public class ResultCode<T> {
 	}
 	
 	/**
+	 * 成功时候的调用
+	 * */
+	public static <T> ResultCode<T> success(CodeMsg cm, T data){
+		return new  ResultCode<T>(cm, data);
+	}
+	
+	/**
 	 * 失败时候的调用
 	 * */
 	public static <T> ResultCode<T> error(CodeMsg cm){
 		return new  ResultCode<T>(cm);
+	}
+	
+	/**
+	 * 失败时候的调用
+	 * */
+	public static <T> ResultCode<T> error(CodeMsg cm, T data){
+		return new  ResultCode<T>(cm, data);
+	}
+	
+	/**
+	 * 传codeMsg和data时候的调用
+	 * */
+	public static <T> ResultCode<T> msgData(CodeMsg cm, T data){
+		return new  ResultCode<T>(cm, data);
 	}
 	
 	private ResultCode(CodeMsg cm, T data) {

@@ -11,14 +11,14 @@ import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.result.ResultCode;
-import com.wbo.currencyExchange.service.OrderService.PlaceOrder;
+import com.wbo.currencyExchange.service.OrderService.PlaceOrderService;
 
 @Controller
 @RequestMapping("/order")
 public class OrderController {
 
 	@Autowired
-	PlaceOrder placeOrder;
+	PlaceOrderService placeOrder;
 	
 	//交易类型--限价买
 	private static final String orderTypeBuyLimit = "buy-limit";
