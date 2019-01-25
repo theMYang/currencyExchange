@@ -25,6 +25,7 @@ public class CodeMsg {
 	
 	//余额模块 105XX
 	public static CodeMsg BALANCE_SHORT_ERROR = new CodeMsg(-10501, "余额不足");
+	public static CodeMsg BALANCE_SET_SUCCESS = new CodeMsg(10502, "订单余额设置成功");
 	
 	
 	private CodeMsg(int code, String msg) {

@@ -1,12 +1,13 @@
 package com.wbo.currencyExchange.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserBalance {
+public class UserBalance implements Serializable {
 	
 	private int balanceId;
 	private int accountId;
@@ -66,6 +67,12 @@ public class UserBalance {
 	public void setBalanceType(int balanceType) {
 		this.balanceType = balanceType;
 	}
-
-
+	
+	
+	@Override
+	public String toString() {
+		return "UserBalance [balanceId=" + balanceId + ", accountId=" + accountId + ", userId=" + userId
+				+ ", contractId=" + contractId + ", changeTime=" + changeTime + ", freezeAmount=" + freezeAmount
+				+ ", balanceAmount=" + balanceAmount + ", balanceType=" + balanceType + "]";
+	}
 }

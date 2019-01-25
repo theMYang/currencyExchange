@@ -56,7 +56,7 @@ public class RabbitSender {
 		rabbitTemplate.convertAndSend("exchange-fm", "wbo.test", msg, correlationData);
 	}
 	
-	public void sendUser(UserLogin user) throws Exception {
+	public void sendUser(Object user) throws Exception {
 		rabbitTemplate.setConfirmCallback(confirmCallback);
 		rabbitTemplate.setReturnCallback(returnCallback);
 		

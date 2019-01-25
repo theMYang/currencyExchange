@@ -10,6 +10,6 @@ public interface MqSender {
 	
 	public ReturnCallback getReturnCallback() ;
 	
-	public void send(MqSendEnvelop mqSendEnvelop, Object payLoad);
+	public void send(MqSendEnvelopItfc mqSendEnvelop, Object payLoad);
 
 }

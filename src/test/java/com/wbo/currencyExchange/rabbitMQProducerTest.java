@@ -1,5 +1,7 @@
 package com.wbo.currencyExchange;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,8 +43,8 @@ public class rabbitMQProducerTest {
 		UserLogin user = new UserLogin();
 		 user.setLoginName("测不准");
 		 user.setMobilePhone("1309696");
-		 user.setPassword("1416");
-		 user.setUserId(123);
+//		 user.setPassword("1416");
+//		 user.setUserId(123);
 		 user.setUserState(1);
 		rabbitSender.sendUser(user);
 	}

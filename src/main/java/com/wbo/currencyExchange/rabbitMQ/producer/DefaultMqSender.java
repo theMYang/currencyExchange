@@ -5,11 +5,13 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ConfirmCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate.ReturnCallback;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.util.UUIDUtil;
 
+@Component
 public class DefaultMqSender extends AbstractMqSender {
 
 	@Autowired
@@ -48,13 +50,16 @@ public class DefaultMqSender extends AbstractMqSender {
 	}
 	
 	@Override
-	public void send(MqSendEnvelop mqSendEnvelop, Object payLoad) {
+	public void send(MqSendEnvelopItfc mqSendEnvelop, Object payLoad) {
+//		RabbitTemplate rabbitTemplate = new RabbitTemplate();
 		rabbitTemplate.setConfirmCallback(confirmCallback);
 		rabbitTemplate.setReturnCallback(returnCallback);
 		
 		String uuid = UUIDUtil.uuid();
 		CorrelationData correlationData = new CorrelationData(uuid);
-		rabbitTemplate.convertAndSend(mqSendEnvelop.getExchange(), mqSendEnvelop.getRoutingKey(), payLoad, correlationData);
+		String exchangeName = mqSendEnvelop.getExchange();
+		String routingName = mqSendEnvelop.getRoutingKey();
+		rabbitTemplate.convertAndSend(exchangeName, routingName, payLoad, correlationData);
 	}
 	
 }
