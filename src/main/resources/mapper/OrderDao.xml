@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Configuration 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.wbo.currencyExchange.dao.orderDao.OrderDao">
+	
+	<insert id="insertOrder">
+		insert into order_table (order_id, user_id, currency_id, order_amount, order_price, order_type) values
+			(#{orderId}, #{userId}, #{currencyId}, #{orderAmount}, #{orderPrice}, #{orderType})
+	</insert>
+
+</mapper>

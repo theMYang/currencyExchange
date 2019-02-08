@@ -15,4 +15,11 @@
 		from user_balance 
 		where user_id = #{userId}
 	</select>
+	
+	<update id="freezeBalanceForOrderDB">
+		update user_balance
+		set freeze_amount = freeze_amount + #{freezeAmount}
+		where user_id = #{userId}
+		and (balance_amount-freeze_amount) &gt;= #{freezeAmount}
+	</update>
 </mapper>

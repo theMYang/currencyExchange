@@ -67,6 +67,7 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	}
 	
 	
+	// 放入消息队列，对数据库的余额进行冻结
 	public void sendFreezeBalanceMq(BigDecimal requiredBalance, int userId) {
 		UserBalance userBalance = new UserBalance(); 
 		userBalance.setFreezeAmount(requiredBalance);
@@ -79,11 +80,13 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	@Override
 	public BigDecimal surplusBalance(BigDecimal requiredBalance, int userId) {
 		BigDecimal possessBalance = reidsService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
+		BigDecimal freezeBalance = reidsService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
 		if(possessBalance==null) {
 			possessBalance = setRedisOfBalance(userId);
 		}
 //		boolean isBalanceEnough = requiredBalance.compareTo(possessBalance) <=0;
-		BigDecimal surplusBalance = possessBalance.subtract(requiredBalance);
+		// 剩余余额应为余额-冻结余额-待冻结余额
+		BigDecimal surplusBalance = possessBalance.subtract(freezeBalance).subtract(requiredBalance);
 		return surplusBalance;
 	}
 	
@@ -111,13 +114,13 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	}
 	
 	@Override
-	public boolean freezeBalanceForOrderReids(BigDecimal requiredBalance, int userId) {
+	public boolean freezeBalanceForOrderReids(BigDecimal freezeBalance, int userId) {
 		boolean res = false;
-		res = reidsService.subByBigDecimal(BalanceKey.BALANCE, userId, requiredBalance);
-		if(!res) {
-			return res;
-		}
-		res = reidsService.incrByBigDecimal(BalanceKey.FREEZE_BALANCE, userId, requiredBalance);
+//		res = reidsService.subByBigDecimal(BalanceKey.BALANCE, userId, freezeBalance);
+//		if(!res) {
+//			return res;
+//		}
+		res = reidsService.incrByBigDecimal(BalanceKey.FREEZE_BALANCE, userId, freezeBalance);
 		if(!res) {
 			return res;
 		}
@@ -126,8 +129,12 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	
 	@Override
 	public boolean freezeBalanceForOrderDB(UserBalance userBalance) {
-		userBalanceDao.freezeBalanceForOrderDB(userBalance);
-		return true;
+		int affectRows = userBalanceDao.freezeBalanceForOrderDB(userBalance);
+		if(affectRows == 1) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 	
 }

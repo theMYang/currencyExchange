@@ -20,7 +20,7 @@ public interface UserBalanceService {
 	// 数据库中下订单后冻结余额  成功返回true 失败返回false
 	public boolean freezeBalanceForOrderDB(UserBalance userBalance);
 	
-	// 下订单时检查余额，并对redis中没有缓存的用户余额进行设置
+	// 下订单时检查余额，并对余额进行冻结（对redis中没有缓存的用户余额进行设置）
 	public CodeMsg checkThenSetBalance(BigDecimal purchaseAmount, BigDecimal purchasePrice, int userId);
 	
 }

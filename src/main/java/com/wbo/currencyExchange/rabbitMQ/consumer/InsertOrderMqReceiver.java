@@ -1,7 +1,6 @@
 package com.wbo.currencyExchange.rabbitMQ.consumer;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Map;
 
 import org.springframework.amqp.rabbit.annotation.Exchange;
@@ -16,32 +15,32 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.Channel;
-import com.wbo.currencyExchange.domain.UserBalance;
-import com.wbo.currencyExchange.rabbitMQ.producer.BalanceMqSendEnvelop;
-import com.wbo.currencyExchange.service.userService.UserBalanceService;
+import com.wbo.currencyExchange.domain.Order;
+import com.wbo.currencyExchange.rabbitMQ.producer.OrderMqSendEnvelop;
+import com.wbo.currencyExchange.service.OrderService.PlaceOrderService;
 
 @Component
-public class FreezeBalanceMqReceiver {
+public class InsertOrderMqReceiver {
 
 	@Autowired
-	UserBalanceService userBalanceService;
+	PlaceOrderService placeOrderService;
 	
 	@RabbitListener(bindings=@QueueBinding(
-			value = @Queue(value= BalanceMqSendEnvelop.BALANCE_FOR_ORDER_QUEUE_WITH_PREFIX, 
+			value = @Queue(value= OrderMqSendEnvelop.ORDER_FOR_INSERT_QUEUE_WITH_PREFIX, 
 			durable = "true"),
-			exchange = @Exchange(value=BalanceMqSendEnvelop.BALANCE_FOR_ORDER_EXCHANGE_WITH_PREFIX, 
+			exchange = @Exchange(value=OrderMqSendEnvelop.ORDER_FOR_INSERT_EXCHANGE_WITH_PREFIX, 
 			durable = "true",
 			type = "topic",
 			ignoreDeclarationExceptions = "true"),
-			key = BalanceMqSendEnvelop.BALANCE_FOR_ORDER_KEY+".#"
+			key = OrderMqSendEnvelop.ORDER_FOR_INSERT_KEY+".#"
 			)
 	)
 	@RabbitHandler
-	public void onFreezeBalanceMessage(@Payload UserBalance userBalance, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+	public void onInsertOrderMessage(@Payload Order order, @Headers Map<String, Object> headers, Channel channel) throws IOException {
 		Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
 		
 		//mq发过来了userBalance的freezeAmount和userId属性
-		boolean res = userBalanceService.freezeBalanceForOrderDB(userBalance);
+		boolean res = placeOrderService.insertOrder(order);
 		
 		//手工 ACK
 		if(res) {

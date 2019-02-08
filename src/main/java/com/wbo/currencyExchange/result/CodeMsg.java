@@ -21,6 +21,7 @@ public class CodeMsg {
 	public static CodeMsg ORDER_AMOUNT_ERROR = new CodeMsg(-10401, "缺少订单数量");
 	public static CodeMsg ORDER_PRICE_ERROR = new CodeMsg(-10402, "缺少订单价格");
 	public static CodeMsg ORDER_TYPE_ERROR = new CodeMsg(-10403, "缺少订单类型");
+	public static CodeMsg ORDER_VALUE_ERROR = new CodeMsg(-10404, "非法订单数量价格");
 	
 	
 	//余额模块 105XX
