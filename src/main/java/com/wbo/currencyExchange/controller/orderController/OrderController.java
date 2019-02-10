@@ -12,7 +12,7 @@ import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.result.ResultCode;
-import com.wbo.currencyExchange.service.OrderService.PlaceOrderService;
+import com.wbo.currencyExchange.service.orderService.PlaceOrderService;
 
 @Controller
 @RequestMapping("/order")

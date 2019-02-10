@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import com.rabbitmq.client.Channel;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.rabbitMQ.producer.OrderMqSendEnvelop;
-import com.wbo.currencyExchange.service.OrderService.PlaceOrderService;
+import com.wbo.currencyExchange.service.orderService.PlaceOrderService;
 
 @Component
 public class InsertOrderMqReceiver {

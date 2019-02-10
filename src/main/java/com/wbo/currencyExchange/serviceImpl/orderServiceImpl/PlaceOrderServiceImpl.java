@@ -4,6 +4,9 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.reset;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +19,7 @@ import com.wbo.currencyExchange.rabbitMQ.producer.DefaultMqSender;
 import com.wbo.currencyExchange.rabbitMQ.producer.OrderMqSendEnvelop;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.result.ResultCode;
-import com.wbo.currencyExchange.service.OrderService.PlaceOrderService;
+import com.wbo.currencyExchange.service.orderService.PlaceOrderService;
 import com.wbo.currencyExchange.service.userService.UserBalanceService;
 import com.wbo.currencyExchange.util.SnowFlakeId;
 import com.wbo.currencyExchange.util.UUIDUtil;
@@ -46,9 +49,18 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		constructOrder(purchaseAmount, purchasePrice, currencyId, userId);
 		insertOrderByMQ(order);
 		
+		// 订单进入定序模块
+		
+		
 		return ResultCode.msgData(checkThenSetBalanCodeMsg, userId);
 	}
 
+	
+	private void orderToSequence() {
+		
+	}
+	
+	
 	
 	@Override
 	public ResultCode placeSellOrder(BigDecimal purchaseAmount, BigDecimal purchasePrice, int currencyId, UserLogin user) {
@@ -90,7 +102,7 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 
 	private void constructOrder(BigDecimal purchaseAmount, BigDecimal purchasePrice, int currencyId, int userId) {
 		SnowFlakeId idWorker = new SnowFlakeId(0, 0);
-		int orderId = (int) idWorker.nextId();
+		long orderId = idWorker.nextId();
 		final int ORDER_TYPE_BUY = 1;
 		
 		order.setOrderId(orderId);
@@ -99,6 +111,45 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		order.setOrderAmount(purchaseAmount);
 		order.setOrderPrice(purchasePrice);
 		order.setOrderType(ORDER_TYPE_BUY);
+	}
+
+
+	// 获取全部非终结态订单List, 并按照currencyId分List存放
+	@Override
+	public HashMap<Integer, List<List<Order>>> getAllNotEndStateOrders() {
+		final int BUY_ORDER_TYPE = 1;
+		final int SELL_ORDER_TYPE = 2;
+		List<Order> notEndStateOrderList = orderDao.getAllNotEndStateOrders();
+		List<List<Order>> buyList = new ArrayList<>();
+		List<List<Order>> sellList = new ArrayList<>();
+		HashMap<Integer, List<List<Order>>> map = new HashMap<>();
+		
+		int index=-1, curCurrencyId = -1;
+		for(int i=0; i<notEndStateOrderList.size(); i++) {
+			Order tempOrder = notEndStateOrderList.get(i);
+			int tempCurrencyId = tempOrder.getCurrencyId();
+			int orderType = tempOrder.getOrderType();
+			
+			if(curCurrencyId != tempCurrencyId) {
+				index++;
+				curCurrencyId = tempCurrencyId;
+				if(orderType == BUY_ORDER_TYPE) {
+					buyList.add(new ArrayList<>());
+				}else if(orderType == SELL_ORDER_TYPE) {
+					sellList.add(new ArrayList<>());
+				}
+			}
+			
+			if(orderType == BUY_ORDER_TYPE) {
+				buyList.get(index).add(tempOrder);
+			}else if(orderType == SELL_ORDER_TYPE) {
+				sellList.get(index).add(tempOrder);
+			}
+		}
+		
+		map.put(BUY_ORDER_TYPE, buyList);
+		map.put(SELL_ORDER_TYPE, sellList);
+		return map;
 	}
 	
 	

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Order implements Serializable{
 
-	private int orderId;
+	private long orderId;
 	private int userId;
 	private int currencyId;
 	private BigDecimal orderAmount;
@@ -24,10 +24,10 @@ public class Order implements Serializable{
 	private Timestamp endStateTime;
 	
 	
-	public int getOrderId() {
+	public long getOrderId() {
 		return orderId;
 	}
-	public void setOrderId(int orderId) {
+	public void setOrderId(long orderId) {
 		this.orderId = orderId;
 	}
 	public int getUserId() {
@@ -101,6 +101,16 @@ public class Order implements Serializable{
 	}
 	public void setEndStateTime(Timestamp endStateTime) {
 		this.endStateTime = endStateTime;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "{orderId=" + orderId + ", userId=" + userId + ", currencyId=" + currencyId + ", orderAmount="
+				+ orderAmount + ", orderPrice=" + orderPrice + ", orderState=" + orderState + ", orderType=" + orderType
+				+ ", dealAmount=" + dealAmount + ", dealPrice=" + dealPrice + ", dealCharge=" + dealCharge
+				+ ", orderCreateTime=" + orderCreateTime + ", orderCancelTime=" + orderCancelTime + ", endStateTime="
+				+ endStateTime + "}";
 	}
 	
 	

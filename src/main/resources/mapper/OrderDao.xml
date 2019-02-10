@@ -8,4 +8,9 @@
 			(#{orderId}, #{userId}, #{currencyId}, #{orderAmount}, #{orderPrice}, #{orderType})
 	</insert>
 
+	<select id="getAllNotEndStateOrders" resultType="Order">
+		select order_id, user_id, currency_id, order_amount-deal_amount, order_price, order_type, order_create_time
+		from order_table
+		where order_state=1 or order_state=2
+	</select>
 </mapper>

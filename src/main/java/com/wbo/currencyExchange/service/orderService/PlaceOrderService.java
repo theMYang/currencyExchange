@@ -1,6 +1,8 @@
-package com.wbo.currencyExchange.service.OrderService;
+package com.wbo.currencyExchange.service.orderService;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
 
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.UserLogin;
@@ -19,4 +21,7 @@ public interface PlaceOrderService {
 	
 	// 订单表插入订单，通过消息队列
 	public void insertOrderByMQ(Order order);
+	
+	// 获取所有非终结态订单
+	public HashMap<Integer, List<List<Order>>> getAllNotEndStateOrders();
 }
