@@ -7,13 +7,16 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wbo.currencyExchange.dao.orderDao.OrderDao;
 import com.wbo.currencyExchange.domain.Order;
+import com.wbo.currencyExchange.domain.OrderDriven;
 import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.rabbitMQ.producer.DefaultMqSender;
 import com.wbo.currencyExchange.rabbitMQ.producer.OrderMqSendEnvelop;
@@ -116,39 +119,37 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 
 	// 获取全部非终结态订单List, 并按照currencyId分List存放
 	@Override
-	public HashMap<Integer, List<List<Order>>> getAllNotEndStateOrders() {
-		final int BUY_ORDER_TYPE = 1;
-		final int SELL_ORDER_TYPE = 2;
+	public HashMap<Integer, HashMap<Integer, List<Order>>> getAllNotEndStateOrders() {
 		List<Order> notEndStateOrderList = orderDao.getAllNotEndStateOrders();
-		List<List<Order>> buyList = new ArrayList<>();
-		List<List<Order>> sellList = new ArrayList<>();
-		HashMap<Integer, List<List<Order>>> map = new HashMap<>();
 		
-		int index=-1, curCurrencyId = -1;
+		HashMap<Integer, List<Order>> buyOrderMap = new HashMap<>();
+		HashMap<Integer, List<Order>> sellOrderMap = new HashMap<>();
+		
+		HashMap<Integer, HashMap<Integer, List<Order>>> map = new HashMap<>();
+		
+		int curCurrencyId = -1;
 		for(int i=0; i<notEndStateOrderList.size(); i++) {
 			Order tempOrder = notEndStateOrderList.get(i);
 			int tempCurrencyId = tempOrder.getCurrencyId();
 			int orderType = tempOrder.getOrderType();
 			
 			if(curCurrencyId != tempCurrencyId) {
-				index++;
 				curCurrencyId = tempCurrencyId;
-				if(orderType == BUY_ORDER_TYPE) {
-					buyList.add(new ArrayList<>());
-				}else if(orderType == SELL_ORDER_TYPE) {
-					sellList.add(new ArrayList<>());
-				}
+				buyOrderMap.put(tempCurrencyId, new ArrayList<>());
+				sellOrderMap.put(tempCurrencyId, new ArrayList<>());
 			}
 			
-			if(orderType == BUY_ORDER_TYPE) {
-				buyList.get(index).add(tempOrder);
-			}else if(orderType == SELL_ORDER_TYPE) {
-				sellList.get(index).add(tempOrder);
+			if(orderType == OrderDriven.BUY_ORDER_TYPE) {
+				List<Order> tempBuyOrderList = buyOrderMap.get(tempCurrencyId);
+				tempBuyOrderList.add(tempOrder);
+			}else if(orderType == OrderDriven.SELL_ORDER_TYPE) {
+				List<Order> tempSellOrderList = sellOrderMap.get(tempCurrencyId);
+				tempSellOrderList.add(tempOrder);
 			}
 		}
 		
-		map.put(BUY_ORDER_TYPE, buyList);
-		map.put(SELL_ORDER_TYPE, sellList);
+		map.put(OrderDriven.BUY_ORDER_TYPE, buyOrderMap);
+		map.put(OrderDriven.SELL_ORDER_TYPE, sellOrderMap);
 		return map;
 	}
 	

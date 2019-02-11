@@ -1,7 +1,9 @@
 package com.wbo.currencyExchange.serviceImpl.matchServiceImpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -24,18 +26,19 @@ public class SequenceServiceImpl implements SequenceService{
 	
 	ConcurrentHashMap<Integer, OrderDriven> sequenceMap = new ConcurrentHashMap<>();
 	
+	// 初始化定序队列，买卖盘
 	public void initSequence() {
-		final int BUY_ORDER_TYPE = 1;
-		final int SELL_ORDER_TYPE = 2;
+		HashMap<Integer, HashMap<Integer, List<Order>>> notEndStateOrderMap = placeOrderService.getAllNotEndStateOrders();
 		
-		HashMap<Integer, List<List<Order>>> notEndStateOrderList = placeOrderService.getAllNotEndStateOrders();
-		int orderListLength = notEndStateOrderList.size();
-		for(int i=0; i<orderListLength; i++) {
-			List<Order> curOrderList = notEndStateOrderList.get(i);
-			int curCurrencyId = curOrderList.get(0).getCurrencyId();
-			ConcurrentSkipListSet<Order> curOrderSet = new ConcurrentSkipListSet<>(curOrderList);
-			// sequenceMap.put(curCurrencyId, curOrderSet);
+		HashMap<Integer, List<Order>> buyOrderNotEndStateMap = notEndStateOrderMap.get(OrderDriven.BUY_ORDER_TYPE);
+		HashMap<Integer, List<Order>> sellOrderNotEndStateMap = notEndStateOrderMap.get(OrderDriven.SELL_ORDER_TYPE);
+		
+		for(Entry<Integer, List<Order>> entry : buyOrderNotEndStateMap.entrySet()) {
+			int curCurrencyId = entry.getKey();
+			List<Order> buyOrderList = entry.getValue();
+			List<Order> sellOrderList = sellOrderNotEndStateMap.get(curCurrencyId);
+			OrderDriven orderDriven = new OrderDriven(buyOrderList, sellOrderList);
+			sequenceMap.put(curCurrencyId, orderDriven);
 		}
-		return;
 	}
 }

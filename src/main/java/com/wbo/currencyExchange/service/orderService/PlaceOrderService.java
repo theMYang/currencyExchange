@@ -23,5 +23,6 @@ public interface PlaceOrderService {
 	public void insertOrderByMQ(Order order);
 	
 	// 获取所有非终结态订单
-	public HashMap<Integer, List<List<Order>>> getAllNotEndStateOrders();
+	// HashMap<ORDER_TYPE, HashMap<currencyId, List<Order>>>
+	public HashMap<Integer, HashMap<Integer, List<Order>>> getAllNotEndStateOrders();
 }
