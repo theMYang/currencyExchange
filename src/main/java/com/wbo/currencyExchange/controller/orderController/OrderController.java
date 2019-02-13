@@ -27,8 +27,8 @@ public class OrderController {
 	//交易类型--限价卖
 	private static final String orderTypeSellLimit = "sell-limit";
 	
-	@RequestMapping("/buyCurrency")
-	public ResultCode buyCurrency(String amount, String price, String type, int currencyId, UserLogin user) {
+	@RequestMapping("/tradeCurrency")
+	public ResultCode tradeCurrency(String amount, String price, String type, int currencyId, UserLogin user) {
 		if(amount==null || amount.equals("") )
 			throw new GlobalException(CodeMsg.ORDER_AMOUNT_ERROR);
 		if(price==null || price.equals("") )
@@ -36,19 +36,19 @@ public class OrderController {
 		if(type==null || type.equals("") )
 			throw new GlobalException(CodeMsg.ORDER_TYPE_ERROR);
 		
-		BigDecimal purchaseAmount = new BigDecimal(amount);
-		BigDecimal purchasePrice = new BigDecimal(price);
+		BigDecimal tradeAmount = new BigDecimal(amount);
+		BigDecimal tradePrice = new BigDecimal(price);
 		
 		final BigDecimal ZERO = new BigDecimal(0);
-		if(purchaseAmount.compareTo(ZERO) <=0 || purchasePrice.compareTo(ZERO) <=0) {
+		if(tradeAmount.compareTo(ZERO) <=0 || tradePrice.compareTo(ZERO) <=0) {
 			throw new GlobalException(CodeMsg.ORDER_VALUE_ERROR);
 		}
 		
 		ResultCode resultCode;
 		if(type.equals(orderTypeBuyLimit)) {
-			resultCode = placeOrder.placeBuyOrder(purchaseAmount, purchasePrice, currencyId, user);
+			resultCode = placeOrder.placeBuyOrder(tradeAmount, tradePrice, currencyId, user);
 		}else if(type.equals(orderTypeSellLimit)) {
-			resultCode = placeOrder.placeSellOrder(purchaseAmount, purchasePrice, currencyId, user);
+			resultCode = placeOrder.placeSellOrder(tradeAmount, tradePrice, currencyId, user);
 		}else {
 			throw new GlobalException(CodeMsg.ORDER_TYPE_ERROR);
 		}

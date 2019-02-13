@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.wbo.currencyExchange.dao.userDao.UserBalanceDao;
 import com.wbo.currencyExchange.domain.UserBalance;
+import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.rabbitMQ.producer.BalanceMqSendEnvelop;
 import com.wbo.currencyExchange.rabbitMQ.producer.DefaultMqSender;
 import com.wbo.currencyExchange.redis.BalanceKey;
 import com.wbo.currencyExchange.redis.RedisService;
 import com.wbo.currencyExchange.result.CodeMsg;
-import com.wbo.currencyExchange.result.ResultCode;
 import com.wbo.currencyExchange.service.userService.UserBalanceService;
 
 /**
@@ -25,7 +25,7 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	@Autowired
 	UserBalanceDao userBalanceDao;
 	@Autowired
-	RedisService<Integer, BigDecimal> reidsService;
+	RedisService<Integer, BigDecimal> redisService;
 	@Autowired
 	DefaultMqSender mqSender;
 
@@ -79,12 +79,17 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	
 	@Override
 	public BigDecimal surplusBalance(BigDecimal requiredBalance, int userId) {
-		BigDecimal possessBalance = reidsService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
-		BigDecimal freezeBalance = reidsService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
-		if(possessBalance==null) {
-			possessBalance = setRedisOfBalance(userId);
+		BigDecimal possessBalance = redisService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
+		BigDecimal freezeBalance = redisService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
+		if(possessBalance==null || freezeBalance==null) {
+			boolean setRedis = setRedisOfBalance(userId);
+			if(!setRedis) {
+				throw new GlobalException(CodeMsg.REDIS_SET_ERROR);
+			}
+			possessBalance = redisService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
+			freezeBalance = redisService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
 		}
-//		boolean isBalanceEnough = requiredBalance.compareTo(possessBalance) <=0;
+		
 		// 剩余余额应为余额-冻结余额-待冻结余额
 		BigDecimal surplusBalance = possessBalance.subtract(freezeBalance).subtract(requiredBalance);
 		return surplusBalance;
@@ -95,14 +100,18 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	/**
 	* @Description: 在redis中设置用户余额信息，包括余额和冻结余额
 	* @param userId
-	* @return BigDecimal    
+	* @return boolean    
 	*/
-	private BigDecimal setRedisOfBalance(int userId) {
+	private boolean setRedisOfBalance(int userId) {
+		boolean res = false;
 		UserBalance balance = getBalanceByUserId(userId);
-		reidsService.setIfAbsentString(BalanceKey.BALANCE, userId, balance.getBalanceAmount());
-		reidsService.setIfAbsentString(BalanceKey.FREEZE_BALANCE, userId, balance.getFreezeAmount());
-		BigDecimal possessbalance = balance.getBalanceAmount();
-		return possessbalance;
+		
+		if(balance == null) {
+			throw new GlobalException(CodeMsg.BALANCE_NULL_SUCCESS);
+		}
+		res = redisService.setIfAbsentString(BalanceKey.BALANCE, userId, balance.getBalanceAmount());
+		res = res && redisService.setIfAbsentString(BalanceKey.FREEZE_BALANCE, userId, balance.getFreezeAmount());
+		return res;
 	}
 	
 	
@@ -116,11 +125,11 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	@Override
 	public boolean freezeBalanceForOrderReids(BigDecimal freezeBalance, int userId) {
 		boolean res = false;
-//		res = reidsService.subByBigDecimal(BalanceKey.BALANCE, userId, freezeBalance);
+//		res = redisService.subByBigDecimal(BalanceKey.BALANCE, userId, freezeBalance);
 //		if(!res) {
 //			return res;
 //		}
-		res = reidsService.incrByBigDecimal(BalanceKey.FREEZE_BALANCE, userId, freezeBalance);
+		res = redisService.incrByBigDecimal(BalanceKey.FREEZE_BALANCE, userId, freezeBalance);
 		if(!res) {
 			return res;
 		}

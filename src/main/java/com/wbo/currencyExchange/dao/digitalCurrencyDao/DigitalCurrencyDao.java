@@ -11,4 +11,6 @@ public interface DigitalCurrencyDao {
 	
 	public List<DigitalCurrency> getHomePageCurrency();
 	
+	public List<DigitalCurrency> getAllCurrency();
+	
 }

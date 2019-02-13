@@ -11,6 +11,7 @@ public class CodeMsg {
 	//中间件 102XXINIT
 	public static CodeMsg MQ_CONFIRM_ERROR = new CodeMsg(-10201, "消息队列确认异常：%s");
 	public static CodeMsg MQ_RETURN_ERROR = new CodeMsg(-10202, "消息队列投递异常：%s");
+	public static CodeMsg REDIS_SET_ERROR = new CodeMsg(-10203, "redis设置错误");
 	
 	
 	//登录模块 103XX
@@ -22,11 +23,13 @@ public class CodeMsg {
 	public static CodeMsg ORDER_PRICE_ERROR = new CodeMsg(-10402, "缺少订单价格");
 	public static CodeMsg ORDER_TYPE_ERROR = new CodeMsg(-10403, "缺少订单类型");
 	public static CodeMsg ORDER_VALUE_ERROR = new CodeMsg(-10404, "非法订单数量价格");
+	public static CodeMsg ORDER_NULL_ERROR = new CodeMsg(-10405, "订单为空");
 	
 	
 	//余额模块 105XX
 	public static CodeMsg BALANCE_SHORT_ERROR = new CodeMsg(-10501, "余额不足");
 	public static CodeMsg BALANCE_SET_SUCCESS = new CodeMsg(10502, "订单余额设置成功");
+	public static CodeMsg BALANCE_NULL_SUCCESS = new CodeMsg(-10503, "该用户无余额信息");
 	
 	
 	private CodeMsg(int code, String msg) {

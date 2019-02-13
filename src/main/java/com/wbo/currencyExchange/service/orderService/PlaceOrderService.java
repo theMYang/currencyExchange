@@ -14,7 +14,7 @@ public interface PlaceOrderService {
 	public ResultCode placeBuyOrder(BigDecimal purchaseAmount, BigDecimal purchasePrice, int currencyId,  UserLogin user);
 	
 	// 下单卖货币
-	public ResultCode placeSellOrder(BigDecimal purchaseAmount, BigDecimal purchasePrice, int currencyId,  UserLogin user);
+	public ResultCode placeSellOrder(BigDecimal sellAmount, BigDecimal sellPrice, int currencyId,  UserLogin user);
 	
 	// 订单表插入订单
 	public boolean insertOrder(Order order);

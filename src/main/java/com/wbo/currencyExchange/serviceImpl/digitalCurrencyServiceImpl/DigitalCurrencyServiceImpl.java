@@ -18,5 +18,10 @@ public class DigitalCurrencyServiceImpl implements DigitalCurrencyService{
 	public List<DigitalCurrency> getHomePageCurrency() {
 		return digitalCurrencyDao.getHomePageCurrency();
 	}
+
+	@Override
+	public List<DigitalCurrency> getAllCurrency() {
+		return digitalCurrencyDao.getAllCurrency();
+	}
 	
 }

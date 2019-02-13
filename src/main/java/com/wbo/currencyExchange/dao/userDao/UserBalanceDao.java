@@ -1,10 +1,8 @@
 package com.wbo.currencyExchange.dao.userDao;
 
-import java.math.BigDecimal;
-
-import javax.websocket.server.PathParam;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.wbo.currencyExchange.domain.UserBalance;
 
@@ -13,7 +11,7 @@ public interface UserBalanceDao {
 
 	public int insertUserBalance(UserBalance userBalance);
 	
-	public UserBalance getBalanceByUserId(@PathParam("userId") int userId);
+	public UserBalance getBalanceByUserId(@Param("userId") int userId);
 	
 	public int freezeBalanceForOrderDB(UserBalance userBalance);
 }

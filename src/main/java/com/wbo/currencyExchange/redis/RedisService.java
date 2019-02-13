@@ -27,9 +27,9 @@ public class RedisService<K, V> {
 		}
 	}
 	
-	public void setIfAbsentString(KeyPrefix keyPrefix, K key, V value) {
+	public boolean setIfAbsentString(KeyPrefix keyPrefix, K key, V value) {
 		String realKey = (String) (keyPrefix.getPrefix() + key);
-		redisTemplate.opsForValue().setIfAbsent( (K) realKey, value);
+		return redisTemplate.opsForValue().setIfAbsent( (K) realKey, value);
 	}
 	
 	public <T> T getString(KeyPrefix keyPrefix, K key, Class<T> clazz) {

@@ -2,46 +2,50 @@ package com.wbo.currencyExchange.domain;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.springframework.stereotype.Component;
+
 // 买卖盘
+@Component
 public class OrderDriven {
 
 	private ConcurrentSkipListSet<Order> buyOrderDriven;
 	private ConcurrentSkipListSet<Order> sellOrderDriven;
 	
-	public static final int BUY_ORDER_TYPE = 1;
-	public static final int SELL_ORDER_TYPE = 2;
 	
-	
-	public OrderDriven() {	}
+	public OrderDriven() {
+		OrderDrivenComparator orderDrivenBuyComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
+		this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
+		
+		OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
+		this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
+	}
 	
 	public OrderDriven(Collection<Order> buyC, Collection<Order> sellC) {
-		orderDrivenComparator orderDrivenBuyComparator = new orderDrivenComparator(BUY_ORDER_TYPE);
+		OrderDrivenComparator orderDrivenBuyComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 		this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 		this.buyOrderDriven.addAll(buyC);
 		
-		orderDrivenComparator orderDrivenSellComparator = new orderDrivenComparator(BUY_ORDER_TYPE);
+		OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 		this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 		this.sellOrderDriven.addAll(sellC);
 	}
 	
 	public OrderDriven(int orderCompareType, Collection<Order> orderC) {
-		if(orderCompareType == BUY_ORDER_TYPE) {
-			orderDrivenComparator orderDrivenBuyComparator = new orderDrivenComparator(BUY_ORDER_TYPE);
+		if(orderCompareType == Order.BUY_ORDER_TYPE) {
+			OrderDrivenComparator orderDrivenBuyComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 			this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 			this.buyOrderDriven.addAll(orderC);
 			
-			orderDrivenComparator orderDrivenSellComparator = new orderDrivenComparator(BUY_ORDER_TYPE);
+			OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 			this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 			
-		}else if(orderCompareType == SELL_ORDER_TYPE) {
-			orderDrivenComparator orderDrivenBuyComparator = new orderDrivenComparator(BUY_ORDER_TYPE);
+		}else if(orderCompareType == Order.SELL_ORDER_TYPE) {
+			OrderDrivenComparator orderDrivenBuyComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 			this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 			
-			orderDrivenComparator orderDrivenSellComparator = new orderDrivenComparator(BUY_ORDER_TYPE);
+			OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 			this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 			this.sellOrderDriven.addAll(orderC);
 		}
@@ -49,29 +53,39 @@ public class OrderDriven {
 	
 	
 	
-	private final class orderDrivenComparator implements Comparator<Order> {
+	private final class OrderDrivenComparator implements Comparator<Order> {
 
 		private int orderCompareType;
 		
-		public orderDrivenComparator(int orderCompareType) {
+		public OrderDrivenComparator(int orderCompareType) {
 			this.orderCompareType = orderCompareType;
 		}
 		
 		@Override
 		public int compare(Order o1, Order o2) {
 			int compareRes = 0;
-			if(orderCompareType == BUY_ORDER_TYPE) {
+			if(orderCompareType == Order.BUY_ORDER_TYPE) {
 				compareRes = o2.getOrderPrice().compareTo(o1.getOrderPrice());
-			}else if(orderCompareType == SELL_ORDER_TYPE) {
+			}else if(orderCompareType == Order.SELL_ORDER_TYPE) {
 				compareRes = o1.getOrderPrice().compareTo(o2.getOrderPrice());
 			}
 			
 			compareRes = compareRes ==0?  o1.getOrderCreateTime().compareTo(o2.getOrderCreateTime()): compareRes;
-			compareRes = compareRes ==0?  o2.getOrderAmount().compareTo(o1.getOrderAmount()): compareRes;
 			compareRes = compareRes ==0?  o1.getOrderId().compareTo(o2.getOrderId()): compareRes;
 			return compareRes;
 		}
 
+	}
+	
+	
+	public boolean addOrder(int orderType, Order order) {
+		boolean res = false;
+		if(orderType == Order.BUY_ORDER_TYPE) {
+			res = this.buyOrderDriven.add(order);
+		}else if(orderType == Order.SELL_ORDER_TYPE) {
+			res = this.sellOrderDriven.add(order);
+		}
+		return res;
 	}
 	
 	

@@ -7,5 +7,9 @@
 		select currency_id, currency_code, currency_en_name, issue_price from digital_currency where is_show= 1
 	</select>
 	
+	<select id="getAllCurrency" resultType="DigitalCurrency">
+		select currency_id, currency_code, currency_en_name, currency_ch_name, issue_time, issue_amount, circulation_amount, currency_order, issue_price, is_show
+		from digital_currency
+	</select>
 
 </mapper>

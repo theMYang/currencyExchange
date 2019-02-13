@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Configuration 3.0//EN" "mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.wbo.currencyExchange.dao.userDao.UserAssetDao">
+	
+	<select id="getUserAssetByUserId" resultType="com.wbo.currencyExchange.domain.UserAsset">
+	    select asset_id, account_id, user_id, currency_id, currency_amount, freeze_amount
+		from user_asset
+		where user_id = #{userId} and currency_id = #{currencyId}
+	</select>
+
+</mapper>

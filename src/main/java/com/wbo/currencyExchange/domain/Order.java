@@ -23,6 +23,9 @@ public class Order implements Serializable{
 	private Timestamp orderCancelTime;
 	private Timestamp endStateTime;
 	
+	public static final int BUY_ORDER_TYPE = 1;
+	public static final int SELL_ORDER_TYPE = 2;
+	
 	
 	public Long getOrderId() {
 		return orderId;

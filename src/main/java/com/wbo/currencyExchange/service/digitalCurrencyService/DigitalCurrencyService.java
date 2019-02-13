@@ -11,4 +11,5 @@ public interface DigitalCurrencyService {
 	
 	public List<DigitalCurrency> getHomePageCurrency();
 	
+	public List<DigitalCurrency> getAllCurrency();
 }
