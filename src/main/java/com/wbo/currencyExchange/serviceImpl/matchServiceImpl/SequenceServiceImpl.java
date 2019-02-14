@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wbo.currencyExchange.domain.DigitalCurrency;
+import com.wbo.currencyExchange.domain.MatchSequence;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.OrderDriven;
 import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.service.digitalCurrencyService.DigitalCurrencyService;
+import com.wbo.currencyExchange.service.matchService.MatchEngineService;
 import com.wbo.currencyExchange.service.matchService.SequenceService;
 import com.wbo.currencyExchange.service.orderService.PlaceOrderService;
 
@@ -29,8 +31,12 @@ public class SequenceServiceImpl implements SequenceService{
 	PlaceOrderService placeOrderService;
 	@Autowired
 	DigitalCurrencyService digitalCurrencyService;
+	@Autowired
+	MatchSequence matchSequence;
+//	@Autowired
+//	MatchEngineService matchEngineService;
 	
-	ConcurrentHashMap<Integer, OrderDriven> sequenceMap = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Integer, OrderDriven> sequenceMap;
 	
 	@Override
 	public void placeOrderToSequence(Order order) {
@@ -38,6 +44,7 @@ public class SequenceServiceImpl implements SequenceService{
 			throw new GlobalException(CodeMsg.ORDER_NULL_ERROR);
 		}
 		
+		sequenceMap = matchSequence.getSequenceMap();
 		if(isSequenceInit.compareAndSet(false, true)) {
 			initSequence();
 		}
@@ -89,6 +96,8 @@ public class SequenceServiceImpl implements SequenceService{
 				sequenceMap.put(currencyId, orderDriven);
 			}
 		}
+		
+//		matchEngineService.initMatchEngine();
 	}
 
 
