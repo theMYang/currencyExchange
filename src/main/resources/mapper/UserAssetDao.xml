@@ -8,5 +8,13 @@
 		from user_asset
 		where user_id = #{userId} and currency_id = #{currencyId}
 	</select>
+	
+	
+	<update id="freezeAssertForOrderDB">
+		update user_asset
+		set freeze_amount = freeze_amount + #{freezeAmount}
+		where user_id = #{userId} and currency_id = #{currencyId}
+		and (currency_amount-freeze_amount) &gt;= #{freezeAmount}
+	</update>
 
 </mapper>

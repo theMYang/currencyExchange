@@ -16,4 +16,10 @@ public interface UserAssetService {
 	
 	
 	public UserAsset getUserAssetByUserId(int userId, int currencyId);
+	
+	
+	public boolean freezeCurrencyForAssetReids(BigDecimal sellAmount, int userId, int currencyId);
+	
+	
+	public boolean freezeAssertForOrderDB(UserAsset userAsset);
 }

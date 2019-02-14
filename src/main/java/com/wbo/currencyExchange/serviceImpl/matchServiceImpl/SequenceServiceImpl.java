@@ -61,6 +61,7 @@ public class SequenceServiceImpl implements SequenceService{
 		int currencyId = order.getCurrencyId();
 		OrderDriven curOrderDriven = sequenceMap.get(currencyId);
 		curOrderDriven.addOrder(Order.SELL_ORDER_TYPE, order);
+		return;
 	}
 	
 	// 初始化定序队列，买卖盘

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.wbo.currencyExchange.dao.userDao.UserAssetDao;
 import com.wbo.currencyExchange.domain.UserAsset;
-import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.exception.GlobalException;
+import com.wbo.currencyExchange.rabbitMQ.producer.AssetMqSendEnvelop;
+import com.wbo.currencyExchange.rabbitMQ.producer.DefaultMqSender;
 import com.wbo.currencyExchange.redis.AssetKey;
-import com.wbo.currencyExchange.redis.BalanceKey;
 import com.wbo.currencyExchange.redis.RedisService;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.service.userService.UserAssetService;
@@ -22,6 +22,8 @@ public class UserAssetServiceImpl implements UserAssetService {
 	RedisService<String, BigDecimal> redisService;
 	@Autowired
 	UserAssetDao userAssetDao;
+	@Autowired
+	DefaultMqSender mqSender;
 	
 	@Override
 	public CodeMsg checkThenSetAsset(BigDecimal sellAmount,  int currencyId, int userId) {
@@ -29,12 +31,37 @@ public class UserAssetServiceImpl implements UserAssetService {
 		final BigDecimal ZERO = new BigDecimal(0);
 		
 		synchronized (this) {
-			BigDecimal surplusAssetCurrency = this.surplusAssetCurrency(sellAmount, currencyId, userId);
+			BigDecimal surplusAssetCurrencyAmount = this.surplusAssetCurrency(sellAmount, currencyId, userId);
+			boolean isAssetCurrencyEnough = surplusAssetCurrencyAmount.compareTo(ZERO) >=0;
+			if(isAssetCurrencyEnough) {
+				boolean freezeAssetCurrency = this.freezeCurrencyForAssetReids(sellAmount, userId, currencyId);
+				if(freezeAssetCurrency) {
+					resCodeMsg = CodeMsg.ASSET_SET_SUCCESS;
+				}else {
+					resCodeMsg = CodeMsg.ASSET_SHORT_ERROR;
+				}
+			}else {
+				resCodeMsg = CodeMsg.ASSET_SHORT_ERROR;
+			}
 		}
 		
-		return null;
+		if(resCodeMsg.getCode() >0) {
+			sendFreezeAssetCurrencyMq(sellAmount, userId, currencyId);
+		}
+		return resCodeMsg;
 	}
 
+	
+	// 放入消息队列，对数据库的余额进行冻结
+	public void sendFreezeAssetCurrencyMq(BigDecimal sellAmount, int userId, int currencyId) {
+		UserAsset userAsset = new UserAsset();
+		userAsset.setCurrencyId(currencyId);
+		userAsset.setUserId(userId);
+		userAsset.setFreezeAmount(sellAmount);
+		mqSender.send(AssetMqSendEnvelop.ASSET_FREEZE_CURRENCY_MQ, userAsset);
+	}
+	
+	
 	@Override
 	public BigDecimal surplusAssetCurrency(BigDecimal sellAmount, int currencyId, int userId) {
 		String prefix = userId + "," + currencyId;
@@ -42,22 +69,17 @@ public class UserAssetServiceImpl implements UserAssetService {
 		BigDecimal assetCurrencyFreezeAmount = redisService.getString(AssetKey.FREEZE_ASSET, prefix, BigDecimal.class);
 		
 		if(assetCurrencyAmount==null || assetCurrencyFreezeAmount==null) {
-			boolean setRedis = setRedisOfAsset(userId, currencyId);
-			if(!setRedis) {
-				throw new GlobalException(CodeMsg.REDIS_SET_ERROR);
-			}
+			setRedisOfAsset(userId, currencyId);
 			assetCurrencyAmount = redisService.getString(AssetKey.ASSET, prefix, BigDecimal.class);
 			assetCurrencyFreezeAmount = redisService.getString(AssetKey.FREEZE_ASSET, prefix, BigDecimal.class);
 		}
 		
-		BigDecimal surplusAssetCurrency = assetCurrencyAmount.subtract(assetCurrencyAmount).subtract(sellAmount);
+		BigDecimal surplusAssetCurrency = assetCurrencyAmount.subtract(assetCurrencyFreezeAmount).subtract(sellAmount);
 		return surplusAssetCurrency;
-		// 待办...
 	}
 
 	
-	private boolean setRedisOfAsset(int userId, int currencyId) {
-		boolean setRedisRes = false;
+	private void setRedisOfAsset(int userId, int currencyId) {
 		String prefix = userId + "," + currencyId;
 		UserAsset userAsset = getUserAssetByUserId(userId, currencyId);
 		BigDecimal currencyAmount = new BigDecimal(0);
@@ -68,9 +90,32 @@ public class UserAssetServiceImpl implements UserAssetService {
 			currencyAmount = userAsset.getCurrencyAmount();
 			freezeAmount = userAsset.getFreezeAmount();
 		}
-		setRedisRes = redisService.setIfAbsentString(AssetKey.ASSET, prefix, currencyAmount);
-		setRedisRes = setRedisRes && redisService.setIfAbsentString(AssetKey.FREEZE_ASSET, prefix, freezeAmount);
-		return setRedisRes;
+		redisService.setIfAbsentString(AssetKey.ASSET, prefix, currencyAmount);
+		redisService.setIfAbsentString(AssetKey.FREEZE_ASSET, prefix, freezeAmount);
+	}
+	
+	
+	@Override
+	public boolean freezeCurrencyForAssetReids(BigDecimal sellAmount, int userId, int currencyId) {
+		boolean res = false;
+		String prefix = userId + "," + currencyId;
+		res = redisService.incrByBigDecimal(AssetKey.FREEZE_ASSET, prefix, sellAmount);
+		if(!res) {
+			setRedisOfAsset(userId, currencyId);
+			res = redisService.incrByBigDecimal(AssetKey.FREEZE_ASSET, prefix, sellAmount);
+		}
+		return res;
+	}
+	
+
+	@Override
+	public boolean freezeAssertForOrderDB(UserAsset userAsset) {
+		int affectRows = userAssetDao.freezeAssertForOrderDB(userAsset);
+		if(affectRows == 1) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 	
 	

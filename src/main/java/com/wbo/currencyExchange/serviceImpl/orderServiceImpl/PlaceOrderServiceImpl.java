@@ -47,7 +47,7 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 
 		// 余额检查并冻结后，添加订单
 		Order order = new Order();
-		constructOrder(order, purchaseAmount, purchasePrice, currencyId, userId);
+		constructOrder(order, purchaseAmount, purchasePrice, currencyId, userId, Order.BUY_ORDER_TYPE);
 		insertOrderByMQ(order);
 		
 		// 订单进入定序模块
@@ -60,11 +60,21 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 	@Override
 	public ResultCode placeSellOrder(BigDecimal sellAmount, BigDecimal sellPrice, int currencyId, UserLogin user) {
 		int userId = user.getUserId();
-		// 下订单时检查资产，并对资产进行冻结
+		// 下订单时检查货币资产，并对资产进行冻结
 		CodeMsg checkThenSetAssetCodeMsg = userAssetService.checkThenSetAsset(sellAmount, currencyId, userId);
+		if(checkThenSetAssetCodeMsg.getCode() < 0) {
+			return ResultCode.error(checkThenSetAssetCodeMsg);
+		}
 		
+		// 余额检查并冻结后，添加订单
+		Order order = new Order();
+		constructOrder(order, sellAmount, sellPrice, currencyId, userId, Order.SELL_ORDER_TYPE);
+		insertOrderByMQ(order);
 		
-		return null;
+		// 订单进入定序模块
+		orderToSequence(order);
+		
+		return ResultCode.msgData(checkThenSetAssetCodeMsg, userId);
 	}
 	
 	
@@ -110,18 +120,17 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		return res;
 	}
 
-	private void constructOrder(Order order, BigDecimal purchaseAmount, BigDecimal purchasePrice, int currencyId, int userId) {
+	private void constructOrder(Order order, BigDecimal orderAmount, BigDecimal orderPrice, int currencyId, int userId, int orderType) {
 		SnowFlakeId idWorker = new SnowFlakeId(0, 0);
 		long orderId = idWorker.nextId();
-		final int ORDER_TYPE_BUY = 1;
 		Timestamp orderCreateTime = new Timestamp(System.currentTimeMillis());
 		
 		order.setOrderId(orderId);
 		order.setUserId(userId);
 		order.setCurrencyId(currencyId);
-		order.setOrderAmount(purchaseAmount);
-		order.setOrderPrice(purchasePrice);
-		order.setOrderType(ORDER_TYPE_BUY);
+		order.setOrderAmount(orderAmount);
+		order.setOrderPrice(orderPrice);
+		order.setOrderType(orderType);
 		order.setOrderCreateTime(orderCreateTime);
 	}
 

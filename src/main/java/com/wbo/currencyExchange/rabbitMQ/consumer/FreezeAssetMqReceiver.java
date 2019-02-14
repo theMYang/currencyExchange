@@ -15,32 +15,32 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.Channel;
-import com.wbo.currencyExchange.domain.UserBalance;
-import com.wbo.currencyExchange.rabbitMQ.producer.BalanceMqSendEnvelop;
-import com.wbo.currencyExchange.service.userService.UserBalanceService;
+import com.wbo.currencyExchange.domain.UserAsset;
+import com.wbo.currencyExchange.rabbitMQ.producer.AssetMqSendEnvelop;
+import com.wbo.currencyExchange.service.userService.UserAssetService;
 
 @Component
-public class FreezeBalanceMqReceiver {
+public class FreezeAssetMqReceiver {
 
 	@Autowired
-	UserBalanceService userBalanceService;
+	UserAssetService userAssetService;
 	
 	@RabbitListener(bindings=@QueueBinding(
-			value = @Queue(value= BalanceMqSendEnvelop.BALANCE_FOR_ORDER_QUEUE_WITH_PREFIX, 
+			value = @Queue(value= AssetMqSendEnvelop.ASSET_FOR_ORDER_QUEUE_WITH_PREFIX, 
 			durable = "true"),
-			exchange = @Exchange(value=BalanceMqSendEnvelop.BALANCE_FOR_ORDER_EXCHANGE_WITH_PREFIX, 
+			exchange = @Exchange(value=AssetMqSendEnvelop.ASSET_FOR_ORDER_EXCHANGE_WITH_PREFIX, 
 			durable = "true",
 			type = "topic",
 			ignoreDeclarationExceptions = "true"),
-			key = BalanceMqSendEnvelop.BALANCE_FOR_ORDER_KEY+".#"
+			key = AssetMqSendEnvelop.ASSET_FOR_ORDER_KEY+".#"
 			)
 	)
 	@RabbitHandler
-	public void onFreezeBalanceMessage(@Payload UserBalance userBalance, @Headers Map<String, Object> headers, Channel channel) throws IOException {
+	public void onFreezeAssetMessage(@Payload UserAsset userAsset, @Headers Map<String, Object> headers, Channel channel) throws IOException {
 		Long deliveryTag = (Long)headers.get(AmqpHeaders.DELIVERY_TAG);
 		
-		//mq发过来了userBalance的freezeAmount和userId属性
-		boolean res = userBalanceService.freezeBalanceForOrderDB(userBalance);
+		//mq发过来了userAsset的freezeAmount、currencyId和userId属性
+		boolean res = userAssetService.freezeAssertForOrderDB(userAsset);
 		
 		//手工 ACK
 		if(res) {

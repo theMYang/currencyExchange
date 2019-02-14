@@ -82,10 +82,7 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 		BigDecimal possessBalance = redisService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
 		BigDecimal freezeBalance = redisService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
 		if(possessBalance==null || freezeBalance==null) {
-			boolean setRedis = setRedisOfBalance(userId);
-			if(!setRedis) {
-				throw new GlobalException(CodeMsg.REDIS_SET_ERROR);
-			}
+			setRedisOfBalance(userId);
 			possessBalance = redisService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
 			freezeBalance = redisService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
 		}
@@ -102,16 +99,14 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	* @param userId
 	* @return boolean    
 	*/
-	private boolean setRedisOfBalance(int userId) {
-		boolean res = false;
+	private void setRedisOfBalance(int userId) {
 		UserBalance balance = getBalanceByUserId(userId);
 		
 		if(balance == null) {
 			throw new GlobalException(CodeMsg.BALANCE_NULL_SUCCESS);
 		}
-		res = redisService.setIfAbsentString(BalanceKey.BALANCE, userId, balance.getBalanceAmount());
-		res = res && redisService.setIfAbsentString(BalanceKey.FREEZE_BALANCE, userId, balance.getFreezeAmount());
-		return res;
+		redisService.setIfAbsentString(BalanceKey.BALANCE, userId, balance.getBalanceAmount());
+		redisService.setIfAbsentString(BalanceKey.FREEZE_BALANCE, userId, balance.getFreezeAmount());
 	}
 	
 	
@@ -131,9 +126,10 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 //		}
 		res = redisService.incrByBigDecimal(BalanceKey.FREEZE_BALANCE, userId, freezeBalance);
 		if(!res) {
-			return res;
+			setRedisOfBalance(userId);
+			res = redisService.incrByBigDecimal(BalanceKey.FREEZE_BALANCE, userId, freezeBalance);
 		}
-		return true;
+		return res;
 	}
 	
 	@Override

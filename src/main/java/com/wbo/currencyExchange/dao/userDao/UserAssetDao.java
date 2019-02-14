@@ -10,4 +10,6 @@ import com.wbo.currencyExchange.domain.UserAsset;
 public interface UserAssetDao {
 
 	public UserAsset getUserAssetByUserId(@Param("userId") int userId, @Param("currencyId") int currencyId);
+	
+	public int freezeAssertForOrderDB(UserAsset userAsset);
 }

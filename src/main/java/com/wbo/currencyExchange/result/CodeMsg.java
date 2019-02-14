@@ -32,6 +32,11 @@ public class CodeMsg {
 	public static CodeMsg BALANCE_NULL_SUCCESS = new CodeMsg(-10503, "该用户无余额信息");
 	
 	
+	//资产模块 106XX
+	public static CodeMsg ASSET_SHORT_ERROR = new CodeMsg(-10601, "资产不足");
+	public static CodeMsg ASSET_SET_SUCCESS = new CodeMsg(10502, "资产冻结成功");
+	
+	
 	private CodeMsg(int code, String msg) {
 		this.code = code;
 		this.msg = msg;
