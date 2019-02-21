@@ -18,7 +18,7 @@ public class OrderDriven {
 		OrderDrivenComparator orderDrivenBuyComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 		this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 		
-		OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
+		OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.SELL_ORDER_TYPE);
 		this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 	}
 	
@@ -27,7 +27,7 @@ public class OrderDriven {
 		this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 		this.buyOrderDriven.addAll(buyC);
 		
-		OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
+		OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.SELL_ORDER_TYPE);
 		this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 		this.sellOrderDriven.addAll(sellC);
 	}
@@ -38,14 +38,14 @@ public class OrderDriven {
 			this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 			this.buyOrderDriven.addAll(orderC);
 			
-			OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
+			OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.SELL_ORDER_TYPE);
 			this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 			
 		}else if(orderCompareType == Order.SELL_ORDER_TYPE) {
 			OrderDrivenComparator orderDrivenBuyComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
 			this.buyOrderDriven = new ConcurrentSkipListSet<>(orderDrivenBuyComparator);
 			
-			OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.BUY_ORDER_TYPE);
+			OrderDrivenComparator orderDrivenSellComparator = new OrderDrivenComparator(Order.SELL_ORDER_TYPE);
 			this.sellOrderDriven = new ConcurrentSkipListSet<>(orderDrivenSellComparator);
 			this.sellOrderDriven.addAll(orderC);
 		}
