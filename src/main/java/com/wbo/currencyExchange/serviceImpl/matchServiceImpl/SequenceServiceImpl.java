@@ -33,8 +33,8 @@ public class SequenceServiceImpl implements SequenceService{
 	DigitalCurrencyService digitalCurrencyService;
 	@Autowired
 	MatchSequence matchSequence;
-//	@Autowired
-//	MatchEngineService matchEngineService;
+	@Autowired
+	MatchEngineService matchEngineService;
 	
 	private ConcurrentHashMap<Integer, OrderDriven> sequenceMap;
 	
@@ -97,7 +97,7 @@ public class SequenceServiceImpl implements SequenceService{
 			}
 		}
 		
-//		matchEngineService.initMatchEngine();
+		matchEngineService.initMatchEngine();
 	}
 
 

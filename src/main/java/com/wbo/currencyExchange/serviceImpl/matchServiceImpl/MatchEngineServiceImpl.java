@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,15 +25,22 @@ public class MatchEngineServiceImpl {
 	private ConcurrentHashMap<Integer, OrderDriven> sequenceMap;
 	private ExecutorService executor;
 	private static volatile boolean matchWorkState = true;
-
+	private ConcurrentHashMap<Integer, Future> futureMap;
 	
 	public void initMatchEngine() {
 		
 		sequenceMap = matchSequence.getSequenceMap();
 		int currentSize = sequenceMap.size();
 		
-		executor = Executors.newFixedThreadPool(currentSize);
+		final int THREAD_NUM = 4;
+//		executor = Executors.newFixedThreadPool(currentSize);
+		executor = new ThreadPoolExecutor(THREAD_NUM, THREAD_NUM, 60, TimeUnit.SECONDS, 
+				new LinkedBlockingQueue<Runnable>());
 		
+		for(int id : sequenceMap.keySet()) {
+			Future futureTmp = executor.submit(new MatchForOrderDriven(id));
+			futureMap.put(id, futureTmp);
+		}
 	}
 	
 	
@@ -47,8 +57,6 @@ public class MatchEngineServiceImpl {
 			this.orderDrivenId = id;
 		}
 		
-		
-		
 		@Override
 		public void run() {
 			OrderDriven orderDriven= sequenceMap.get(orderDrivenId);
@@ -60,12 +68,11 @@ public class MatchEngineServiceImpl {
 					// 再写个处理函数
 					Order matchedBuyOrder = buyOrderDriven.pollFirst();
 					Order matchedSellOrder = sellOrderDriven.pollFirst();
-					
+					// 扔给mq，由清算系统处理
 				}
 			}
 			
 		}
-		
 		
 		public boolean matchSuccess(ConcurrentSkipListSet<Order> buyOrderDriven, ConcurrentSkipListSet<Order> sellOrderDriven) {
 			BigDecimal buyPrice = buyOrderDriven.first().getOrderPrice();
