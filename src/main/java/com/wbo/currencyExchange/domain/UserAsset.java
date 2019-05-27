@@ -3,13 +3,18 @@ package com.wbo.currencyExchange.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component
+@Scope("prototype")
 public class UserAsset implements Serializable{
 
 	private int assetId;
 	private int userId;
 	private int currencyId;
-	private BigDecimal currencyAmount;
-	private BigDecimal freezeAmount;
+	private BigDecimal currencyAmount = BigDecimal.ZERO;
+	private BigDecimal freezeAmount = BigDecimal.ZERO;
 	
 	
 	public int getAssetId() {

@@ -24,6 +24,8 @@ public class UserAssetServiceImpl implements UserAssetService {
 	UserAssetDao userAssetDao;
 	@Autowired
 	DefaultMqSender mqSender;
+	@Autowired
+	UserAsset userAsset;
 	
 	@Override
 	public CodeMsg checkThenSetAsset(BigDecimal sellAmount,  int currencyId, int userId) {
@@ -46,7 +48,11 @@ public class UserAssetServiceImpl implements UserAssetService {
 		}
 		
 		if(resCodeMsg.getCode() >0) {
-			sendFreezeAssetCurrencyMq(sellAmount, userId, currencyId);
+			userAsset.setCurrencyId(currencyId);
+			userAsset.setUserId(userId);
+			userAsset.setFreezeAmount(sellAmount);
+			boolean res = freezeAssertForOrderDB(userAsset);
+//			sendFreezeAssetCurrencyMq(sellAmount, userId, currencyId);
 		}
 		return resCodeMsg;
 	}
@@ -122,5 +128,16 @@ public class UserAssetServiceImpl implements UserAssetService {
 	public UserAsset getUserAssetByUserId(int userId, int currencyId) {
 		UserAsset userAsset = userAssetDao.getUserAssetByUserId(userId, currencyId);
 		return userAsset;
+	}
+
+
+	@Override
+	public boolean updateAssertForClearing(UserAsset userAsset) {
+		int affectRows = userAssetDao.updateAssertForClearing(userAsset);
+		if(affectRows >0) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 }

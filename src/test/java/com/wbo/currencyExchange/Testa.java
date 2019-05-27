@@ -2,22 +2,31 @@ package com.wbo.currencyExchange;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.wbo.currencyExchange.domain.MatchSequence;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.OrderDriven;
 
-@Service
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class Testa {
 
 	@Autowired
-	MatchSequence matchSequence;
+	Order order1;
+	@Autowired
+	Order order2;
 	
+	@Test
 	public void test1() {
-		ConcurrentHashMap<Integer, OrderDriven>	map = matchSequence.getSequenceMap();
-		map.put(123321, new OrderDriven());
-//		matchSequence.setSequenceMap(map);
+		order1.setCurrencyId(101);
+		order2.setCurrencyId(105);
+		System.err.println(order1);
+		System.err.println(order2);
 	}
 }

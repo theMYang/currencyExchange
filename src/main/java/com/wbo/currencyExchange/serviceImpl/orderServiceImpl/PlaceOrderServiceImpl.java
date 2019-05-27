@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.wbo.currencyExchange.dao.orderDao.OrderDao;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.UserLogin;
+import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.rabbitMQ.producer.DefaultMqSender;
 import com.wbo.currencyExchange.rabbitMQ.producer.OrderMqSendEnvelop;
 import com.wbo.currencyExchange.result.CodeMsg;
@@ -25,6 +28,8 @@ import com.wbo.currencyExchange.util.SnowFlakeId;
 @Service
 public class PlaceOrderServiceImpl implements PlaceOrderService{
 
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	@Autowired
 	UserBalanceService userBalanceService;
 	@Autowired
@@ -35,6 +40,9 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 	SequenceService sequenceService;
 	@Autowired
 	UserAssetService userAssetService;
+	@Autowired
+	Order order;
+	
 	
 	@Override
 	public ResultCode placeBuyOrder(BigDecimal purchaseAmount, BigDecimal purchasePrice, int currencyId, UserLogin user) {
@@ -46,9 +54,13 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		}
 
 		// 余额检查并冻结后，添加订单
-		Order order = new Order();
 		constructOrder(order, purchaseAmount, purchasePrice, currencyId, userId, Order.BUY_ORDER_TYPE);
-		insertOrderByMQ(order);
+//		insertOrderByMQ(order);
+		boolean insertSucc = insertOrder(order);
+		if(!insertSucc) {
+			return ResultCode.error(CodeMsg.ORDER_INSERT_ERROR);
+		}
+			
 		
 		// 订单进入定序模块
 		orderToSequence(order);
@@ -67,16 +79,18 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		}
 		
 		// 余额检查并冻结后，添加订单
-		Order order = new Order();
 		constructOrder(order, sellAmount, sellPrice, currencyId, userId, Order.SELL_ORDER_TYPE);
-		insertOrderByMQ(order);
+		boolean insertSucc = insertOrder(order);
+		if(!insertSucc) {
+			return ResultCode.error(CodeMsg.ORDER_INSERT_ERROR);
+		}
+//		insertOrderByMQ(order);
 		
 		// 订单进入定序模块
 		orderToSequence(order);
 		
 		return ResultCode.msgData(checkThenSetAssetCodeMsg, userId);
 	}
-	
 	
 	
 	private void orderToSequence(Order order) {
@@ -170,9 +184,31 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		map.put(Order.SELL_ORDER_TYPE, sellOrderMap);
 		return map;
 	}
+
+
 	
 	
 	
 	
 	
+	@Override
+	public int updateOrdersForClearing(List<Order> clearingOrderList) {
+		int updateOrdersForClearingNum = orderDao.updateOrdersForClearing(clearingOrderList);
+		return updateOrdersForClearingNum;
+	}
+
+
+	@Override
+	public int updateOrderForClearing(Order order) {
+		int updateOrderForClearingNum = orderDao.updateOrderForClearing(order);
+		return updateOrderForClearingNum;
+	}
+	
+	
+//	@Override
+//	public void acceptOrder(BigDecimal sellAmount, BigDecimal sellPrice, int currencyId, UserLogin user, int OrderType) {
+//		int userId = user.getUserId();
+//		constructOrder(order, sellAmount, sellPrice, currencyId, userId, OrderType);
+//		insertOrderByMQ(order);
+//	}
 }

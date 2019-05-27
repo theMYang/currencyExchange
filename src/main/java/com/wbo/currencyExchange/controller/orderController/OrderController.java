@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.exception.GlobalException;
 import com.wbo.currencyExchange.result.CodeMsg;
@@ -39,8 +40,7 @@ public class OrderController {
 		BigDecimal tradeAmount = new BigDecimal(amount);
 		BigDecimal tradePrice = new BigDecimal(price);
 		
-		final BigDecimal ZERO = new BigDecimal(0);
-		if(tradeAmount.compareTo(ZERO) <=0 || tradePrice.compareTo(ZERO) <=0) {
+		if(tradeAmount.compareTo(BigDecimal.ZERO) <=0 || tradePrice.compareTo(BigDecimal.ZERO) <=0) {
 			throw new GlobalException(CodeMsg.ORDER_VALUE_ERROR);
 		}
 		

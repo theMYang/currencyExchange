@@ -4,10 +4,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import javax.validation.Valid;
+
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Order implements Serializable{
+@Scope("prototype")
+public class Order implements Serializable, Cloneable{
 
 	private Long orderId;
 	private int userId;
@@ -25,6 +29,12 @@ public class Order implements Serializable{
 	
 	public static final int BUY_ORDER_TYPE = 1;
 	public static final int SELL_ORDER_TYPE = 2;
+	
+	public static final int COMMITED = 1;
+	public static final int PARTIAL_COMMITED = 2;
+	public static final int PARTIAL_COMMITED_CANCEL = 3;
+	public static final int DEAL = 4;
+	public static final int CANCEL = 5;
 	
 	
 	public Long getOrderId() {
@@ -116,5 +126,9 @@ public class Order implements Serializable{
 				+ endStateTime + "}";
 	}
 	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
 	
 }

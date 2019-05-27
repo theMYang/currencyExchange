@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,10 +40,21 @@ public class SequenceServiceImpl implements SequenceService{
 	
 	private ConcurrentHashMap<Integer, OrderDriven> sequenceMap;
 	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Override
-	public void placeOrderToSequence(Order order) {
+	public boolean placeOrderToSequence(Order order) {
+		
+		logger.info("orderorderorderorderorderorderorderorder:  "+order);
 		if(order == null) {
 			throw new GlobalException(CodeMsg.ORDER_NULL_ERROR);
+		}
+		
+		Order addOrder;
+		try {
+			addOrder = (Order) order.clone();
+		} catch (CloneNotSupportedException e) {
+			logger.error("CloneNotSupportedException： "+order);
+			return false;
 		}
 		
 		sequenceMap = matchSequence.getSequenceMap();
@@ -49,36 +62,51 @@ public class SequenceServiceImpl implements SequenceService{
 			initSequence();
 		}
 		
-		if(order.getOrderType() == Order.BUY_ORDER_TYPE) {
-			placeBuyOrderToSequence(order);
-		}else if(order.getOrderType() == Order.SELL_ORDER_TYPE) {
-			placeSellOrderToSequence(order);
+		if(addOrder.getOrderType() == Order.BUY_ORDER_TYPE) {
+			placeBuyOrderToSequence(addOrder);
+		}else if(addOrder.getOrderType() == Order.SELL_ORDER_TYPE) {
+			placeSellOrderToSequence(addOrder);
 		}
+		return true;
 	}
 	
 	// 买订单进队列
 	private void placeBuyOrderToSequence(Order order) {
 		int currencyId = order.getCurrencyId();
 		OrderDriven curOrderDriven = sequenceMap.get(currencyId);
-		curOrderDriven.addOrder(Order.BUY_ORDER_TYPE, order);
+		if(curOrderDriven != null) {
+			curOrderDriven.addOrder(Order.BUY_ORDER_TYPE, order);
+		}else {
+			throw new GlobalException(CodeMsg.ORDER_NULL_ERROR); 
+		}
+		
 	}
 	
 	// 卖订单进队列
 	private void placeSellOrderToSequence(Order order) {
 		int currencyId = order.getCurrencyId();
 		OrderDriven curOrderDriven = sequenceMap.get(currencyId);
-		curOrderDriven.addOrder(Order.SELL_ORDER_TYPE, order);
-		return;
+		if(curOrderDriven != null) {
+			curOrderDriven.addOrder(Order.SELL_ORDER_TYPE, order);
+		}else {
+			throw new GlobalException(CodeMsg.ORDER_NULL_ERROR); 
+		}
 	}
 	
 	// 初始化定序队列，买卖盘
-	public void initSequence() {
+	public synchronized void initSequence() {
+		// 防止多次初始化
+		if(!isSequenceInit.compareAndSet(false, true)) {
+			return;
+		}
+		
 		HashMap<Integer, HashMap<Integer, List<Order>>> notEndStateOrderMap = placeOrderService.getAllNotEndStateOrders();
 		List<DigitalCurrency> digitalCurrencyList = digitalCurrencyService.getAllCurrency();
 		
 		HashMap<Integer, List<Order>> buyOrderNotEndStateMap = notEndStateOrderMap.get(Order.BUY_ORDER_TYPE);
 		HashMap<Integer, List<Order>> sellOrderNotEndStateMap = notEndStateOrderMap.get(Order.SELL_ORDER_TYPE);
 		
+		sequenceMap = matchSequence.getSequenceMap();
 		for(Entry<Integer, List<Order>> entry : buyOrderNotEndStateMap.entrySet()) {
 			int curCurrencyId = entry.getKey();
 			List<Order> buyOrderList = entry.getValue();

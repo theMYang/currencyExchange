@@ -20,6 +20,15 @@
 		update user_balance
 		set freeze_amount = freeze_amount + #{freezeAmount}
 		where user_id = #{userId}
-		and (balance_amount-freeze_amount) &gt;= #{freezeAmount}
+		and balance_amount &gt;= (#{freezeAmount}+freeze_amount)
 	</update>
+	
+	<update id="updateBalanceForClearing">
+		update user_balance
+		set freeze_amount = freeze_amount + #{freezeAmount},
+			balance_amount = balance_amount + #{balanceAmount},
+			change_time = now()
+		where user_id = #{userId}
+	</update>
+	
 </mapper>

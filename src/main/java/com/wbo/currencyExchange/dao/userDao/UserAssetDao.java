@@ -12,4 +12,7 @@ public interface UserAssetDao {
 	public UserAsset getUserAssetByUserId(@Param("userId") int userId, @Param("currencyId") int currencyId);
 	
 	public int freezeAssertForOrderDB(UserAsset userAsset);
+	
+	// 清算系统更新
+	public int updateAssertForClearing(UserAsset userAsset);
 }

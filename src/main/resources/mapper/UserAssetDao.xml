@@ -16,5 +16,12 @@
 		where user_id = #{userId} and currency_id = #{currencyId}
 		and (currency_amount-freeze_amount) &gt;= #{freezeAmount}
 	</update>
+	
+	
+	<update id="updateAssertForClearing">
+		INSERT INTO currencyExchange.user_asset (account_id, currency_id, currency_amount, freeze_amount, user_id) 
+			VALUES ((select account_id from user_account where user_id = #{userId} limit 1), #{currencyId}, #{currencyAmount}, #{freezeAmount}, #{userId}) 
+		    ON DUPLICATE KEY UPDATE currency_amount=currency_amount+#{currencyAmount}, freeze_amount=freeze_amount+#{freezeAmount}
+	</update>
 
 </mapper>

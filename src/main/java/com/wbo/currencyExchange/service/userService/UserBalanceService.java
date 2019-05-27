@@ -23,4 +23,7 @@ public interface UserBalanceService {
 	// 下订单时检查余额，并对余额进行冻结（对redis中没有缓存的用户余额进行设置）
 	public CodeMsg checkThenSetBalance(BigDecimal purchaseAmount, BigDecimal purchasePrice, int userId);
 	
+	// 清算系统更新
+	public boolean updateBalanceForClearing(UserBalance userBalance);
+	
 }

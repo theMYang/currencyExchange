@@ -3,6 +3,7 @@ package com.wbo.currencyExchange.service.userService;
 import java.math.BigDecimal;
 
 import com.wbo.currencyExchange.domain.UserAsset;
+import com.wbo.currencyExchange.domain.UserBalance;
 import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.result.CodeMsg;
 
@@ -22,4 +23,7 @@ public interface UserAssetService {
 	
 	
 	public boolean freezeAssertForOrderDB(UserAsset userAsset);
+	
+	// 清算系统更新
+	public boolean updateAssertForClearing(UserAsset userAsset);
 }

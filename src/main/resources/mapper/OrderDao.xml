@@ -12,12 +12,43 @@
 		select order_id as orderId, 
 				user_id as userId ,
 				currency_id as currencyId,
-				order_amount-deal_amount as orderAmount ,
+				order_amount as orderAmount ,
 				order_price as orderPrice ,
 				order_type as orderType ,
+				deal_amount as dealAmount,
+				deal_price as dealPrice,
 				order_create_time as orderCreateTime
 		from order_table
 		where order_state=1 or order_state=2
 		order by currency_id
 	</select>
+	
+	<update id="updateOrderForClearing">  
+	        update order_table
+	        set
+	            order_state=#{orderState},
+	            deal_amount=#{dealAmount},
+	            <if test="endStateTime !=null">
+	                end_state_time = now(),
+	            </if>
+	            deal_price= #{dealPrice}
+	        where order_id = #{orderId} and order_amount &gt;= #{dealAmount}
+	</update>
+	
+	<update id="updateOrdersForClearing"  parameterType="java.util.List">  
+	    <foreach collection="list" item="item" open="" close="" separator=";">
+	        update order_table
+	        <set>
+	            order_state=${item.orderState},
+	            deal_amount=${item.dealAmount},
+	            <if test="item.endStateTime !=null">
+                    end_state_time = now(),
+                </if>
+	            deal_price=${item.dealPrice}
+	        </set>
+	        where order_id = ${item.orderId} and order_amount &gt;= #{dealAmount}
+	    </foreach>      
+	</update>
+	
+	
 </mapper>

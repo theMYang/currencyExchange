@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope("prototype")
 public class UserBalance implements Serializable {
 	
 	private int balanceId;
@@ -14,8 +17,9 @@ public class UserBalance implements Serializable {
 	private int userId;
 	private int contractId;
 	private Timestamp changeTime;
-	private BigDecimal freezeAmount;
-	private BigDecimal balanceAmount;
+	
+	private BigDecimal freezeAmount = BigDecimal.ZERO;
+	private BigDecimal balanceAmount = BigDecimal.ZERO;
 	private int balanceType;
 	
 	

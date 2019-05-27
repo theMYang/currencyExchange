@@ -1,5 +1,6 @@
 package com.wbo.currencyExchange.rabbitMQ.producer;
 
+
 public class OrderMqSendEnvelop extends BaseMqSendEnvelop {
 
 	private OrderMqSendEnvelop(String exchange, String routingKey) {

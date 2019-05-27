@@ -24,18 +24,35 @@ public class CodeMsg {
 	public static CodeMsg ORDER_TYPE_ERROR = new CodeMsg(-10403, "缺少订单类型");
 	public static CodeMsg ORDER_VALUE_ERROR = new CodeMsg(-10404, "非法订单数量价格");
 	public static CodeMsg ORDER_NULL_ERROR = new CodeMsg(-10405, "订单为空");
+	public static CodeMsg ORDER_CURRENCY_ERROR = new CodeMsg(-10406, "非法货币订单");
+	public static CodeMsg ORDER_INSERT_ERROR = new CodeMsg(-10407, "订单插入失败");
 	
 	
 	//余额模块 105XX
 	public static CodeMsg BALANCE_SHORT_ERROR = new CodeMsg(-10501, "余额不足");
 	public static CodeMsg BALANCE_SET_SUCCESS = new CodeMsg(10502, "订单余额设置成功");
-	public static CodeMsg BALANCE_NULL_SUCCESS = new CodeMsg(-10503, "该用户无余额信息");
+	public static CodeMsg BALANCE_NULL_ERROR = new CodeMsg(-10503, "该用户无余额信息");
 	
 	
 	//资产模块 106XX
 	public static CodeMsg ASSET_SHORT_ERROR = new CodeMsg(-10601, "资产不足");
 	public static CodeMsg ASSET_SET_SUCCESS = new CodeMsg(10502, "资产冻结成功");
 	
+	
+	//清算模块 107XX
+	public static CodeMsg CLEARING_ORDER_VAILD_ERROR = new CodeMsg(-10701, "清算订单非法");
+	public static CodeMsg OVERSOLD_ERROR = new CodeMsg(-10702, "超卖");
+	public static CodeMsg CLEARING_ORDER_UPDATE_ERROR = new CodeMsg(-10703, "清算订单更新失败");
+	public static CodeMsg CLEARING_PROPERTY_UPDATE_ERROR = new CodeMsg(-10704, "清算订单更新失败");
+
+
+	//成交模块 108XX
+	public static CodeMsg DEAL_VAILD_ERROR = new CodeMsg(-10801, "成交项非法");
+	public static CodeMsg INSERT_DEAL_ERROR = new CodeMsg(-10802, "添加成交项失败");
+	
+	
+	// 撮合模块 109XX
+	public static CodeMsg ADD_TO_SEQUENCE_ERROR = new CodeMsg(-10901, "插入定序队列异常");
 	
 	private CodeMsg(int code, String msg) {
 		this.code = code;

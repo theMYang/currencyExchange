@@ -43,11 +43,10 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	public CodeMsg checkThenSetBalance(BigDecimal purchaseAmount, BigDecimal purchasePrice, int userId) {
 		BigDecimal requiredBalance = purchaseAmount.multiply(purchasePrice);
 		CodeMsg resCodeMsg = null;
-		final BigDecimal ZERO = new BigDecimal(0);
 		
 		synchronized (this) {
 			BigDecimal surplusBalance = this.surplusBalance(requiredBalance, userId);
-			boolean isBalanceEnough = surplusBalance.compareTo(ZERO) >=0;
+			boolean isBalanceEnough = surplusBalance.compareTo(BigDecimal.ZERO) >=0;
 			if(isBalanceEnough) {
 				boolean freezeBalance = this.freezeBalanceForOrderReids(requiredBalance, userId);
 				if(freezeBalance) {
@@ -61,7 +60,11 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 		}
 		
 		if(resCodeMsg.getCode() >0) {
-			sendFreezeBalanceMq(requiredBalance, userId);
+			// sendFreezeBalanceMq(requiredBalance, userId);
+			UserBalance userBalance = new UserBalance(); 
+			userBalance.setFreezeAmount(requiredBalance);
+			userBalance.setUserId(userId);
+			boolean res = freezeBalanceForOrderDB(userBalance);
 		}
 		return resCodeMsg;
 	}
@@ -77,6 +80,7 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	
 	
 	
+	
 	@Override
 	public BigDecimal surplusBalance(BigDecimal requiredBalance, int userId) {
 		BigDecimal possessBalance = redisService.getString(BalanceKey.BALANCE, userId, BigDecimal.class);
@@ -87,7 +91,7 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 			freezeBalance = redisService.getString(BalanceKey.FREEZE_BALANCE, userId, BigDecimal.class);
 		}
 		
-		// 剩余余额应为余额-冻结余额-待冻结余额
+		// 剩余余额=余额-冻结余额-待冻结余额
 		BigDecimal surplusBalance = possessBalance.subtract(freezeBalance).subtract(requiredBalance);
 		return surplusBalance;
 	}
@@ -103,7 +107,7 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 		UserBalance balance = getBalanceByUserId(userId);
 		
 		if(balance == null) {
-			throw new GlobalException(CodeMsg.BALANCE_NULL_SUCCESS);
+			throw new GlobalException(CodeMsg.BALANCE_NULL_ERROR);
 		}
 		redisService.setIfAbsentString(BalanceKey.BALANCE, userId, balance.getBalanceAmount());
 		redisService.setIfAbsentString(BalanceKey.FREEZE_BALANCE, userId, balance.getFreezeAmount());
@@ -135,6 +139,18 @@ public class UserBalanceServiceImpl implements UserBalanceService{
 	@Override
 	public boolean freezeBalanceForOrderDB(UserBalance userBalance) {
 		int affectRows = userBalanceDao.freezeBalanceForOrderDB(userBalance);
+		if(affectRows == 1) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+
+
+	@Override
+	public boolean updateBalanceForClearing(UserBalance userBalance) {
+		int affectRows = userBalanceDao.updateBalanceForClearing(userBalance);
 		if(affectRows == 1) {
 			return true;
 		}else {

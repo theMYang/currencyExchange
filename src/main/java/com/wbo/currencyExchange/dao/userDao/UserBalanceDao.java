@@ -14,4 +14,6 @@ public interface UserBalanceDao {
 	public UserBalance getBalanceByUserId(@Param("userId") int userId);
 	
 	public int freezeBalanceForOrderDB(UserBalance userBalance);
+	
+	public int updateBalanceForClearing(UserBalance userBalance);
 }

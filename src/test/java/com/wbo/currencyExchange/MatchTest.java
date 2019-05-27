@@ -7,7 +7,9 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.wbo.currencyExchange.domain.MatchSequence;
@@ -18,6 +20,7 @@ import com.wbo.currencyExchange.serviceImpl.matchServiceImpl.SequenceServiceImpl
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@PropertySource("classpath:/sysconfig.properties")
 public class MatchTest {
 
 	private static Logger logger = LogManager.getLogger(MatchTest.class);
@@ -26,17 +29,14 @@ public class MatchTest {
 	SequenceServiceImpl sequenceService;
 	@Autowired
 	MatchSequence matchSequence;
-	@Autowired
-	Testa testa;
-	@Autowired
-	Testb testb;
+	@Value("${matchSystem.ThreadNum}")
+	int val =5;
 	
 	@Test
 	public void initSequenceTest() {
 		
-		testa.test1();
-		testb.test1();
-		ConcurrentHashMap<Integer, OrderDriven> map = matchSequence.getSequenceMap();
-		System.err.println(map);
+//		sequenceService.initSequence();
+//		ConcurrentHashMap<Integer, OrderDriven> map = matchSequence.getSequenceMap();
+//		System.err.println(map);
 	}
 }
