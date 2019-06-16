@@ -44,7 +44,11 @@ public class CodeMsg {
 	public static CodeMsg OVERSOLD_ERROR = new CodeMsg(-10702, "超卖");
 	public static CodeMsg CLEARING_ORDER_UPDATE_ERROR = new CodeMsg(-10703, "清算订单更新失败");
 	public static CodeMsg CLEARING_PROPERTY_UPDATE_ERROR = new CodeMsg(-10704, "清算订单更新失败");
-
+	
+	public static CodeMsg MATCHED_ORDER_USER_ERROR = new CodeMsg(-10705, "撮合订单用户名ID相同");
+	public static CodeMsg MATCHED_ORDER_CURRENCY_ERROR = new CodeMsg(-10706, "撮合订单货币不同");
+	public static CodeMsg MATCHED_ORDER_AMOUNT_ERROR = new CodeMsg(-10707, "撮合订单交易量非法");
+	public static CodeMsg MATCHED_ORDER_TYPE_ERROR = new CodeMsg(-10708, "撮合订单交易类型不匹配");
 
 	//成交模块 108XX
 	public static CodeMsg DEAL_VAILD_ERROR = new CodeMsg(-10801, "成交项非法");
@@ -71,4 +75,10 @@ public class CodeMsg {
 		String msg = String.format(this.msg, args);
 		return new CodeMsg(code, msg);
 	}
+
+	@Override
+	public String toString() {
+		return "CodeMsg [code=" + code + ", msg=" + msg + "]";
+	}
+	
 }

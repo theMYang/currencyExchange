@@ -13,9 +13,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wbo.currencyExchange.annotation.ValidMatchedOrder;
 import com.wbo.currencyExchange.domain.Deal;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.UserAsset;
@@ -66,12 +66,13 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 	
 	@Override
 	@Transactional
+	@ValidMatchedOrder
 	public boolean clearingOrder(Order matchedBuyOrder,  Order matchedSellOrder) {
 		// 校验order正确性
-		boolean vaildRes = vaildMatchedOrder(matchedBuyOrder, matchedSellOrder);
-		if(!vaildRes) {
-			throw new GlobalException(CodeMsg.CLEARING_ORDER_VAILD_ERROR);
-		}
+//		boolean vaildRes = vaildMatchedOrder(matchedBuyOrder, matchedSellOrder);
+//		if(!vaildRes) {
+//			throw new GlobalException(CodeMsg.CLEARING_ORDER_VAILD_ERROR);
+//		}
 		
 		// 总订单量
 		BigDecimal buyOrderTotalAmount = matchedBuyOrder.getOrderAmount();
@@ -162,6 +163,7 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 
 	// 结算余额和资产
 	@Transactional
+	@ValidMatchedOrder
 	public void clearingBalanceNAsset(Order matchedBuyOrder, Order matchedSellOrder, BigDecimal dealAmount, BigDecimal dealPrice) {
 
 		boolean vaildRes = vaildMatchedOrder(matchedBuyOrder, matchedSellOrder);
@@ -218,6 +220,7 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 	
 	
 	// 将匹配后有剩余的订单重回定序队列
+	@ValidMatchedOrder
 	public void reAddResrOrderToSeq(Order matchedBuyOrder, Order matchedSellOrder) {
 		
 		if(matchedBuyOrder==null || matchedSellOrder==null)
@@ -261,6 +264,7 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 	}
 
 	// 成交量
+		@ValidMatchedOrder
 		private BigDecimal dealAmount(Order matchedBuyOrder, Order matchedSellOrder) {
 			// 总订单量
 			BigDecimal buyOrderTotalAmount = matchedBuyOrder.getOrderAmount();

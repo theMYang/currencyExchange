@@ -1,6 +1,5 @@
 package com.wbo.currencyExchange.serviceImpl.matchServiceImpl;
 
-import static org.junit.Assert.assertArrayEquals;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -10,9 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+
 
 import com.wbo.currencyExchange.domain.MatchSequence;
 import com.wbo.currencyExchange.domain.Order;
@@ -92,6 +90,11 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			int id = currencyIdList.get(nextCurrencyIdx());
 			Future<Integer> futureTmp = executor.submit(new MatchForOrderDriven(id));
 			futureMap.put(id, futureTmp);
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 //			try {
 //				Future<Integer> futureTmp = executor.submit(new MatchForOrderDriven(id));
 //				futureMap.put(id, futureTmp);

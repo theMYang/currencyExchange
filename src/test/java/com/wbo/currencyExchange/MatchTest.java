@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.wbo.currencyExchange.annotation.ValidMatchedOrder;
 import com.wbo.currencyExchange.domain.MatchSequence;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.OrderDriven;
@@ -22,7 +23,7 @@ import com.wbo.currencyExchange.serviceImpl.matchServiceImpl.SequenceServiceImpl
 @SpringBootTest
 @PropertySource("classpath:/sysconfig.properties")
 public class MatchTest {
-
+	
 	private static Logger logger = LogManager.getLogger(MatchTest.class);
 	
 	@Autowired
@@ -35,8 +36,9 @@ public class MatchTest {
 	@Test
 	public void initSequenceTest() {
 		
-//		sequenceService.initSequence();
-//		ConcurrentHashMap<Integer, OrderDriven> map = matchSequence.getSequenceMap();
-//		System.err.println(map);
+		sequenceService.initSequence();
+		ConcurrentHashMap<Integer, OrderDriven> map = matchSequence.getSequenceMap();
+		System.err.println(map);
 	}
+	
 }

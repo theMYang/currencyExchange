@@ -12,6 +12,7 @@
 	<artifactId>currencyExchange</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>currencyExchange</name>
+	<packaging>jar</packaging>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -106,6 +107,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+
 
 	<dependencyManagement>
 		<dependencies>

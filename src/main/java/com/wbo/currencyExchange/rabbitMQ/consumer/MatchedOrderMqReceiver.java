@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.rabbitmq.client.Channel;
+import com.wbo.currencyExchange.annotation.ValidMatchedOrder;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.rabbitMQ.producer.MatchedOrderMqSendEnvelop;
 import com.wbo.currencyExchange.service.clearingService.ClearingSystemService;
@@ -60,15 +61,28 @@ public class MatchedOrderMqReceiver {
 			throw new IllegalArgumentException("撮合订单类型非法");
 		}
 		
-		//mq发过来了撮合系统的买、卖订单
-		boolean res = clearingSystemService.clearingOrder(buyOrder, sellOrder);
+//		//mq发过来了撮合系统的买、卖订单
+//		boolean res = clearingSystemService.clearingOrder(buyOrder, sellOrder);
+//		
+//		//手工 ACK
+//		if(res) {
+//			channel.basicAck(deliveryTag, false);
+//		}else {
+//			channel.basicNack(deliveryTag, false, true);
+//		}
 		
-		//手工 ACK
-		if(res) {
-			channel.basicAck(deliveryTag, false);
-		}else {
+		try {
+			boolean res = clearingSystemService.clearingOrder(buyOrder, sellOrder);
+			if(res) {
+				channel.basicAck(deliveryTag, false);
+			}else {
+				channel.basicNack(deliveryTag, false, true);
+			}
+		} catch (Exception e) {
 			channel.basicNack(deliveryTag, false, true);
+			// 并且将buyOrder, sellOrder重回队列
 		}
+		
 		
 	}
 }

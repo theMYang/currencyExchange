@@ -44,7 +44,7 @@ public class SequenceServiceImpl implements SequenceService{
 	@Override
 	public boolean placeOrderToSequence(Order order) {
 		
-		logger.info("orderorderorderorderorderorderorderorder:  "+order);
+		logger.info("订单入定序队列:  "+order);
 		if(order == null) {
 			throw new GlobalException(CodeMsg.ORDER_NULL_ERROR);
 		}
@@ -94,7 +94,7 @@ public class SequenceServiceImpl implements SequenceService{
 	}
 	
 	// 初始化定序队列，买卖盘
-	public synchronized void initSequence() {
+	public void initSequence() {
 		// 防止多次初始化
 		if(!isSequenceInit.compareAndSet(false, true)) {
 			return;
