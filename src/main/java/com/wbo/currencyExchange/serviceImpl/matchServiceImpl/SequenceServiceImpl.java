@@ -58,6 +58,8 @@ public class SequenceServiceImpl implements SequenceService{
 		}
 		
 		sequenceMap = matchSequence.getSequenceMap();
+		
+		//isSequenceInit应用普通bool
 		if(isSequenceInit.compareAndSet(false, true)) {
 			initSequence();
 		}
@@ -94,7 +96,7 @@ public class SequenceServiceImpl implements SequenceService{
 	}
 	
 	// 初始化定序队列，买卖盘
-	public void initSequence() {
+	public synchronized void initSequence() {
 		// 防止多次初始化
 		if(!isSequenceInit.compareAndSet(false, true)) {
 			return;

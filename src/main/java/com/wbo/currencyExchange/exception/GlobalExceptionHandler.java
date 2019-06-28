@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +18,8 @@ import com.wbo.currencyExchange.result.ResultCode;
 @ControllerAdvice
 @ResponseBody
 public class GlobalExceptionHandler {
+	
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@ExceptionHandler(value=Exception.class)
 	public ResultCode<String> ExceptionHandler(HttpServletRequest request, Exception e){

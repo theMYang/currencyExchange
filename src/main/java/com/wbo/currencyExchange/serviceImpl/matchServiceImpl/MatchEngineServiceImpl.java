@@ -90,6 +90,8 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			int id = currencyIdList.get(nextCurrencyIdx());
 			Future<Integer> futureTmp = executor.submit(new MatchForOrderDriven(id));
 			futureMap.put(id, futureTmp);
+			
+			//解决cpu100%，sleep释放cpu资源
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
@@ -127,6 +129,8 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			
 			while(matchTimes-->0) {
 				// 锁住相同currencyId的买卖盘。由于submit快于任务执行，导致任务队列堆积。之后可能出现同一id有多个线程任务，造成线程问题。
+				// 如果不加锁，可能线程一刚matchSuccess，线程二pollFirst。线程一之后会得到两不匹配的Order(虽然不匹配之后也会校验)，或order为null。
+				// 如果不加锁，matchSuccess中可能取到以被poll的旧值，导致错误的计算。
 				synchronized (orderDriven) {
 					if(matchSuccess(buyOrderDriven, sellOrderDriven)) {
 						// 再写个处理函数

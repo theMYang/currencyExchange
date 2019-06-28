@@ -28,7 +28,7 @@ import com.wbo.currencyExchange.util.SnowFlakeId;
 @Service
 public class PlaceOrderServiceImpl implements PlaceOrderService{
 
-	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
 	UserBalanceService userBalanceService;
@@ -165,6 +165,7 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 			int tempCurrencyId = tempOrder.getCurrencyId();
 			int orderType = tempOrder.getOrderType();
 			
+			// 直接buyOrderMap.comtainsKey()判断就好啊？？（这样写虽然不会错）
 			if(curCurrencyId != tempCurrencyId) {
 				curCurrencyId = tempCurrencyId;
 				buyOrderMap.put(tempCurrencyId, new ArrayList<>());

@@ -21,6 +21,7 @@ public class RedisConfig {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         // 使用Jackson2JsonRedisSerialize 替换默认序列化
+        //用Jackson2JsonRedisSerializer，被序列化的类不需要实现Serializable接口，也不会出现使用spring-boot-devtools时反序列化遇到的类型转换异常
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
 
         ObjectMapper objectMapper = new ObjectMapper();

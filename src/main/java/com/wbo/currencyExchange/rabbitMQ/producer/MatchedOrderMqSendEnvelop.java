@@ -15,5 +15,4 @@ public class MatchedOrderMqSendEnvelop extends BaseMqSendEnvelop {
 	public static final String KEY = "order";
 	
 	public static final MatchedOrderMqSendEnvelop MATCHED_ORDER_MQ = new MatchedOrderMqSendEnvelop(MQ_EXCHANGE, KEY+".matched");
-	
 }
