@@ -37,6 +37,13 @@ public class RedisService<K, V> {
 		return (T) redisTemplate.opsForValue().get(realKey);
 	}
 	
+	
+	public void deleteString(KeyPrefix keyPrefix, int key) {
+		String realKey = (String) (keyPrefix.getPrefix() + key);
+		redisTemplate.delete((K) realKey);
+	}
+	
+	
 	public synchronized boolean incrByBigDecimal(KeyPrefix keyPrefix, K key, BigDecimal val) {
 		RedisTemplate<K, BigDecimal> redisTemplateTemp = new RedisTemplate<>();
 		BigDecimal oldVal = this.getString(keyPrefix, key, BigDecimal.class);

@@ -20,7 +20,11 @@ import com.wbo.currencyExchange.domain.Deal;
 import com.wbo.currencyExchange.domain.Order;
 import com.wbo.currencyExchange.domain.UserAsset;
 import com.wbo.currencyExchange.domain.UserBalance;
+import com.wbo.currencyExchange.domain.UserLogin;
 import com.wbo.currencyExchange.exception.GlobalException;
+import com.wbo.currencyExchange.redis.AssetKey;
+import com.wbo.currencyExchange.redis.BalanceKey;
+import com.wbo.currencyExchange.redis.RedisService;
 import com.wbo.currencyExchange.result.CodeMsg;
 import com.wbo.currencyExchange.service.clearingService.ClearingSystemService;
 import com.wbo.currencyExchange.service.dealService.DealService;
@@ -122,11 +126,13 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 		ClearingSystemService clearingSystemService = applicationContext.getBean(ClearingSystemService.class);
 		clearingSystemService.clearingBalanceNAsset(matchedBuyOrder, matchedSellOrder, dealAmount, orderPriceTotal);
 		
+		
 		return true;
 	}
 	
 	
-	// 更新Order和Deal
+	
+	// 更新Order和Deal  (Order状态，已成交量等信息。添加deal)
 	@Transactional
 	public void updateClearingResult(Order matchedBuyOrder, Order matchedSellOrder, Deal deal, BigDecimal dealAmount, BigDecimal orderPriceTotal) {
 		boolean insertDealSucc = dealService.insertDeal(deal);
@@ -161,7 +167,7 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 	@Autowired
 	UserAssetService userAssetService;
 
-	// 结算余额和资产
+	// 结算余额和资产 
 	@Transactional
 	@ValidMatchedOrder
 	public void clearingBalanceNAsset(Order matchedBuyOrder, Order matchedSellOrder, BigDecimal dealAmount, BigDecimal dealPrice) {
@@ -213,10 +219,18 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 			throw new GlobalException(CodeMsg.CLEARING_PROPERTY_UPDATE_ERROR);
 		}
 		
+		deleteBalanceNAssetRedis(matchedBuyOrder.getUserId(), matchedSellOrder.getUserId());
 	}
 	
-	
-	
+	// 删除redis中买卖两家的余额和冻结余额、资产和冻结资产
+	@Autowired
+	RedisService<Integer, Object> redisService;
+	public void deleteBalanceNAssetRedis(int buyUserId, int sellUserId) {
+		redisService.deleteString(BalanceKey.BALANCE, buyUserId);
+		redisService.deleteString(BalanceKey.FREEZE_BALANCE, buyUserId);
+		redisService.deleteString(AssetKey.ASSET, sellUserId);
+		redisService.deleteString(AssetKey.FREEZE_ASSET, sellUserId);
+	}
 	
 	
 	// 将匹配后有剩余的订单重回定序队列

@@ -146,6 +146,8 @@ public class PlaceOrderServiceImpl implements PlaceOrderService{
 		order.setOrderPrice(orderPrice);
 		order.setOrderType(orderType);
 		order.setOrderCreateTime(orderCreateTime);
+		order.setDealAmount(new BigDecimal(0));
+		order.setDealPrice(new BigDecimal(0));
 	}
 
 

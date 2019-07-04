@@ -24,7 +24,7 @@ public class DigitalCurrencyController {
 	@Autowired
 	UserLoginService userLoginService;
 	
-	
+	@RequestMapping("/home")
 	public String getHomePageCurrency() {
 		List<DigitalCurrency> homePageCurrency = digitalCurrencyService.getHomePageCurrency();
 		ResultCode<List<DigitalCurrency>> homePageCurrencyRet = ResultCode.success(homePageCurrency);

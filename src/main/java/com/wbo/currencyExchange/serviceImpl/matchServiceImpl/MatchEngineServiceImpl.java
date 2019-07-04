@@ -47,7 +47,7 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 	
 	private ConcurrentHashMap<Integer, OrderDriven> sequenceMap;
 	private ThreadPoolExecutor executor;
-	private static volatile boolean matchWorkState = true;
+	private static volatile boolean matchWorkState = false;
 	private final ConcurrentHashMap<Integer, Future<Integer>> futureMap = new ConcurrentHashMap<>();
 	private final CopyOnWriteArrayList<Integer> currencyIdList = new CopyOnWriteArrayList<>();
 	
@@ -80,9 +80,12 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 		
 		for(int id : sequenceMap.keySet()) {
 			currencyIdList.add(id);
+			Future<Integer> futureTmp = executor.submit(new MatchForOrderDriven(id));
+			futureMap.put(id, futureTmp);
 		}
 		
 		
+		/*
 		while(matchWorkState) {
 //			logger.info("ActiveCount: "+executor.getActiveCount());
 //			logger.info("TaskCount: "+executor.getTaskCount());
@@ -92,11 +95,11 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			futureMap.put(id, futureTmp);
 			
 			//解决cpu100%，sleep释放cpu资源
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 //			try {
 //				Future<Integer> futureTmp = executor.submit(new MatchForOrderDriven(id));
 //				futureMap.put(id, futureTmp);
@@ -107,6 +110,7 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 //			}
 			
 		}
+		*/
 		
 	}
 	
@@ -125,24 +129,53 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			ConcurrentSkipListSet<Order> buyOrderDriven = orderDriven.getBuyOrderDriven();
 			ConcurrentSkipListSet<Order> sellOrderDriven = orderDriven.getSellOrderDriven();
 			
-			int matchTimes = 100;
+			int matchTimes = 0;
+			int unMatch = 0;
+			long times = 0;
 			
-			while(matchTimes-->0) {
+			while(true) {
+				matchTimes++;
+				times++;
+//				if(times>2000000) {
+//					logger.info("撮合ID"+orderDrivenId);
+//					times=0;
+//				}
+				
 				// 锁住相同currencyId的买卖盘。由于submit快于任务执行，导致任务队列堆积。之后可能出现同一id有多个线程任务，造成线程问题。
 				// 如果不加锁，可能线程一刚matchSuccess，线程二pollFirst。线程一之后会得到两不匹配的Order(虽然不匹配之后也会校验)，或order为null。
 				// 如果不加锁，matchSuccess中可能取到以被poll的旧值，导致错误的计算。
 				synchronized (orderDriven) {
+//					if(orderDrivenId==101 && times>1000000) {
+//						logger.info("撮合ID"+orderDrivenId+"  "+sellOrderDriven.size());
+//						logger.info("撮合ID"+sequenceMap);
+//						times=0;
+//					}
 					if(matchSuccess(buyOrderDriven, sellOrderDriven)) {
 						// 再写个处理函数
 						Order matchedBuyOrder = buyOrderDriven.pollFirst();
 						Order matchedSellOrder = sellOrderDriven.pollFirst();
 						// 扔给mq，由清算系统处理
 						sendMatchedOrder(Arrays.asList(matchedBuyOrder, matchedSellOrder));
+						unMatch=0;
+					}else {
+						unMatch++;
+					}
+					
+//					try {
+//						Thread.sleep(1);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+					// 连续十次未匹配成功或匹配超过100次yield。
+					if(unMatch>10 || matchTimes> 100) {
+						unMatch = 0;
+						matchTimes = 0;
+						Thread.yield();
 					}
 				}
+				
 			}
 			
-			return orderDrivenId;
 		}
 		
 		private boolean matchSuccess(ConcurrentSkipListSet<Order> buyOrderDriven, ConcurrentSkipListSet<Order> sellOrderDriven) {

@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,7 @@ public class MatchedOrderMqReceiver {
 		if(orderGroup.size() != 2)
 			throw new IllegalArgumentException("撮合买卖订单数非法");
 		
+		
 		Order buyOrder = orderGroup.get(0);
 		Order sellOrder = orderGroup.get(1);
 		
@@ -72,6 +74,9 @@ public class MatchedOrderMqReceiver {
 //		}
 		
 		try {
+			logger.info("清算MQ买"+buyOrder);
+			logger.info("清算MQ卖"+sellOrder);
+			
 			boolean res = clearingSystemService.clearingOrder(buyOrder, sellOrder);
 			if(res) {
 				channel.basicAck(deliveryTag, false);

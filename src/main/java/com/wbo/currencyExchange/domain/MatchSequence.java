@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MatchSequence {
 
-	private final ConcurrentHashMap<Integer, OrderDriven> sequenceMap = new ConcurrentHashMap<Integer, OrderDriven>();
+	private static final ConcurrentHashMap<Integer, OrderDriven> sequenceMap = new ConcurrentHashMap<Integer, OrderDriven>();
 	
 	
 	public ConcurrentHashMap<Integer, OrderDriven> getSequenceMap() {
