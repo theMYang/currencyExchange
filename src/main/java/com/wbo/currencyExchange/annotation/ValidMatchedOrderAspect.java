@@ -62,10 +62,10 @@ public class ValidMatchedOrderAspect {
 			}
 		}
 		
-		if(buyOrder.getUserId() == sellOrder.getUserId()) {
-			logger.error(joinPoint.getSignature()+ ";"+ "参数列表："+Arrays.asList(joinPoint.getArgs())+ "订单为："+Arrays.asList(matchedOrders));
-			throw new GlobalException(CodeMsg.MATCHED_ORDER_USER_ERROR);
-		}
+//		if(buyOrder.getUserId() == sellOrder.getUserId()) {
+//			logger.error(joinPoint.getSignature()+ ";"+ "参数列表："+Arrays.asList(joinPoint.getArgs())+ "订单为："+Arrays.asList(matchedOrders));
+//			throw new GlobalException(CodeMsg.MATCHED_ORDER_USER_ERROR);
+//		}
 		if(buyOrder.getCurrencyId() != sellOrder.getCurrencyId()) {
 			logger.error(joinPoint.getSignature()+ ";"+ "参数列表："+Arrays.asList(joinPoint.getArgs())+ "订单为："+Arrays.asList(matchedOrders));
 			throw new GlobalException(CodeMsg.MATCHED_ORDER_CURRENCY_ERROR);

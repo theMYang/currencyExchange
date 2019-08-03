@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +46,9 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 	@Value("${matchSystem.MatchTaskThreadQueue}")
 	private static final int TASK_NUM = 20;
 	
+	@Value("${matchSystem.MatchTimeForEachThread}")
+	private static final int MATCH_TIMES = 20000000;
+	
 	private ConcurrentHashMap<Integer, OrderDriven> sequenceMap;
 	private ThreadPoolExecutor executor;
 	private static volatile boolean matchWorkState = false;
@@ -76,7 +80,7 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 		
 //		executor = Executors.newFixedThreadPool(currentSize);
  		executor = new ThreadPoolExecutor(N_CPU+1, N_CPU+1, 60, TimeUnit.SECONDS, 
-				new ArrayBlockingQueue<Runnable>(TASK_NUM), new ThreadPoolExecutor.DiscardPolicy());
+				new LinkedBlockingQueue<Runnable>(), new ThreadPoolExecutor.DiscardPolicy());
 		
 		for(int id : sequenceMap.keySet()) {
 			currencyIdList.add(id);
@@ -135,11 +139,6 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			
 			while(true) {
 				matchTimes++;
-				times++;
-//				if(times>2000000) {
-//					logger.info("撮合ID"+orderDrivenId);
-//					times=0;
-//				}
 				
 				// 锁住相同currencyId的买卖盘。由于submit快于任务执行，导致任务队列堆积。之后可能出现同一id有多个线程任务，造成线程问题。
 				// 如果不加锁，可能线程一刚matchSuccess，线程二pollFirst。线程一之后会得到两不匹配的Order(虽然不匹配之后也会校验)，或order为null。
@@ -161,17 +160,17 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 						unMatch++;
 					}
 					
-//					try {
-//						Thread.sleep(1);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-					// 连续十次未匹配成功或匹配超过100次yield。
-					if(unMatch>10 || matchTimes> 100) {
-						unMatch = 0;
-						matchTimes = 0;
-						Thread.yield();
+					try {
+						Thread.sleep(1);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
+					// 连续十次未匹配成功或匹配超过MATCH_TIMES次yield。unMatch暂未使用
+//					if(unMatch>MATCH_TIMES+1 || matchTimes> MATCH_TIMES) {
+//						unMatch = 0;
+//						matchTimes = 0;
+//						Thread.yield();
+//					}
 				}
 				
 			}
@@ -184,8 +183,6 @@ public class MatchEngineServiceImpl implements MatchEngineService {
 			if(buyOrderDriven.size() ==0 || sellOrderDriven.size()==0)
 				return false;
 			
-			int a = buyOrderDriven.size();
-			int b = sellOrderDriven.size();
 			BigDecimal buyPrice = buyOrderDriven.first().getOrderPrice();
 			BigDecimal sellPrice = sellOrderDriven.first().getOrderPrice();
 			return buyPrice.compareTo(sellPrice) >=0;
