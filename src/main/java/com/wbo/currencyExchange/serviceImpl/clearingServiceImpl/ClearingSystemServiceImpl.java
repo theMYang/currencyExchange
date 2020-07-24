@@ -57,7 +57,7 @@ public class ClearingSystemServiceImpl implements ClearingSystemService, Applica
 	 * 
 	 * 为了解决同一个类中调另一个函数没法用@Transactional，clearingOrder调用clearingBalanceNAsset。在clearingOrder中@Autowired	ClearingSystemService ，
 	 * 从beanFactory中取出clearingBalanceNAsset调用，解决该问题。
-	 * 之后联调撮合系统后，发现了线程问题。修改方法如下：：
+	 * 之后联调撮合系统后，发现了线程问题。修改方法如下：feature/matcher-0.1.0：
 	 * 解决方法1：把消息队列的并发参数（concurrency）改为1，改成个单线程访问。这种解决不彻底。
 	 * 解决方法2：把该类scop改为property。但由于@Autowired	ClearingSystemService会造成循环依赖的问题。去掉这个autowired，改用ApplicationContextAware之后从beanFactory
 	 * 					手动取出这个类。
