@@ -24,8 +24,8 @@ public class Testa {
 	
 	@Test
 	public void test1() {
-		order1.setCurrencyId(101);
-		order2.setCurrencyId(105);
+		order1.setCurrencyId(1010);
+		order2.setCurrencyId(1050);
 		System.err.println(order1);
 		System.err.println(order2);
 	}
